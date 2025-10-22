@@ -1,0 +1,884 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_limite",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_umbral",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_owner",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_feed",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_tokenERC20",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ExtraccionRechazada",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "limite",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "umbral",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_InicializacionInvalida",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_LimiteExcedido",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "limite",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_LimiteInvalido",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_MontoCero",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_OperacionNoPermitida",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "precio",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_OraculoComprometido",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "precio",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_PrecioDesactualizado",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_SaldoInsuficiente",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_UmbralExcedido",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "umbral",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_UmbralInvalido",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					}
+				],
+				"name": "OwnableInvalidOwner",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "OwnableUnauthorizedAccount",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					}
+				],
+				"name": "SafeERC20FailedOperation",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_DepositoRealizado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ExtraccionRealizada",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "fallback"
+			},
+			{
+				"inputs": [],
+				"name": "depositarETH",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_monto",
+						"type": "uint256"
+					}
+				],
+				"name": "depositarUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "i_feed",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_monto",
+						"type": "uint256"
+					}
+				],
+				"name": "retirarETH",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_monto",
+						"type": "uint256"
+					}
+				],
+				"name": "retirarUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_nuevoOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferirOwner",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verBoveda",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "monto_",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verSaldoETH",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "saldo_",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verSaldoUSDC",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "saldo_",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verTotalContrato",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verTotalDepositos",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verTotalRetiros",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
+			}
+		],
+		"devdoc": {
+			"errors": {
+				"KipuBank_ExtraccionRechazada(address,uint256)": [
+					{
+						"params": {
+							"monto": "monto a extraer de la boveda",
+							"titular": "titular de la cuenta a realizar la extracción"
+						}
+					}
+				],
+				"KipuBank_InicializacionInvalida(uint256,uint256)": [
+					{
+						"params": {
+							"limite": "limite del contrato",
+							"umbral": "umbral del contrato"
+						}
+					}
+				],
+				"KipuBank_LimiteExcedido(uint256)": [
+					{
+						"params": {
+							"monto": "monto que excede el limite a depositar"
+						}
+					}
+				],
+				"KipuBank_LimiteInvalido(uint256)": [
+					{
+						"params": {
+							"limite": "limite que es invalido"
+						}
+					}
+				],
+				"KipuBank_MontoCero(address)": [
+					{
+						"params": {
+							"titular": "titular que emite una transaccion con valor nulo"
+						}
+					}
+				],
+				"KipuBank_OperacionNoPermitida(address)": [
+					{
+						"params": {
+							"titular": "titular que realizo la operacion no permitida"
+						}
+					}
+				],
+				"KipuBank_OraculoComprometido(uint256)": [
+					{
+						"params": {
+							"precio": "Precio que dió el óraculo"
+						}
+					}
+				],
+				"KipuBank_PrecioDesactualizado(uint256)": [
+					{
+						"params": {
+							"precio": "Es el precio que quedó desactualizado"
+						}
+					}
+				],
+				"KipuBank_SaldoInsuficiente(address,uint256)": [
+					{
+						"params": {
+							"monto": "monto a retirar",
+							"titular": "titular con saldo insuficiente"
+						}
+					}
+				],
+				"KipuBank_UmbralExcedido(uint256)": [
+					{
+						"params": {
+							"monto": "que excede el umbral establecido"
+						}
+					}
+				],
+				"KipuBank_UmbralInvalido(uint256)": [
+					{
+						"params": {
+							"umbral": "umbral que es invalido"
+						}
+					}
+				],
+				"OwnableInvalidOwner(address)": [
+					{
+						"details": "The owner is not a valid owner account. (eg. `address(0)`)"
+					}
+				],
+				"OwnableUnauthorizedAccount(address)": [
+					{
+						"details": "The caller account is not authorized to perform an operation."
+					}
+				],
+				"SafeERC20FailedOperation(address)": [
+					{
+						"details": "An operation with an ERC-20 token failed."
+					}
+				]
+			},
+			"events": {
+				"KipuBank_DepositoRealizado(address,uint256)": {
+					"params": {
+						"monto": "monto que se desea depositar",
+						"titular": "titular que realiza el detposito"
+					}
+				},
+				"KipuBank_ExtraccionRealizada(address,uint256)": {
+					"params": {
+						"monto": "monto que se desea extraer",
+						"titular": "titular que desea realizar la extracción"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"constructor": {
+					"details": "Se deben generar el limite, umbral y las direcciones del data feed y el token a utilizar al momento de desplegar el contrato",
+					"params": {
+						"_feed": "Direccion del data feed a utlizar",
+						"_limite": "Limite global que se permite por transaccion",
+						"_tokenERC20": "Direccion del token ERC20 a utilizar",
+						"_umbral": "Umbral de limite de retiros"
+					}
+				},
+				"depositarETH()": {
+					"details": "Es payable y usa el modificador de verificarDepositos"
+				},
+				"depositarUSDC(uint256)": {
+					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no Ether"
+				},
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+				},
+				"retirarETH(uint256)": {
+					"params": {
+						"_monto": "es el monto a retirar de la boveda"
+					}
+				},
+				"retirarUSDC(uint256)": {
+					"params": {
+						"_monto": "es el monto a retirar de la boveda"
+					}
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				},
+				"transferirOwner(address)": {
+					"details": "El modificador de onlyOwner es necesario para seguridad",
+					"params": {
+						"_nuevoOwner": "Será la dirección del nuevo propietario del contrato"
+					}
+				},
+				"verBoveda()": {
+					"returns": {
+						"monto_": "devuelve el saldo depositado total en USD depositado por cada titular"
+					}
+				},
+				"verSaldoETH()": {
+					"returns": {
+						"saldo_": "Retornal el saldo en ETH"
+					}
+				},
+				"verSaldoUSDC()": {
+					"returns": {
+						"saldo_": "Retorna el saldo en USDC"
+					}
+				},
+				"verTotalContrato()": {
+					"returns": {
+						"_0": "Devuelve el saldo del contrato en USD"
+					}
+				},
+				"verTotalDepositos()": {
+					"returns": {
+						"_0": "Devuelve la cantidad de depositos"
+					}
+				},
+				"verTotalRetiros()": {
+					"returns": {
+						"_0": "Devuelve la cantidad de retiros"
+					}
+				}
+			},
+			"stateVariables": {
+				"DECIMAL_FACTOR": {
+					"details": "Se hace la suma de los decimales de ethereum y de los decimales de la conversión de chainlink para restarles los decimales de USDC, nos da la base igualitaria"
+				},
+				"HEARTBEAT": {
+					"details": "Por convención se establece en 3600"
+				},
+				"_boveda": {
+					"details": "El total se calcula en USD"
+				},
+				"_totalContrato": {
+					"details": "El total del contrato es en USD"
+				},
+				"i_bankCap": {
+					"details": "Tener en cuenta que el limite global será en USD"
+				},
+				"i_feed": {
+					"details": "Utilizamos el data feed de Chainlink"
+				},
+				"i_usdc": {
+					"details": "Es especifico para el token USDC"
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"errors": {
+				"KipuBank_ExtraccionRechazada(address,uint256)": [
+					{
+						"notice": "Error de extraccion"
+					}
+				],
+				"KipuBank_InicializacionInvalida(uint256,uint256)": [
+					{
+						"notice": "Error de umbral mayor al limite"
+					}
+				],
+				"KipuBank_LimiteExcedido(uint256)": [
+					{
+						"notice": "Error por sobrepasarse del limite"
+					}
+				],
+				"KipuBank_LimiteInvalido(uint256)": [
+					{
+						"notice": "Error por limite invalido"
+					}
+				],
+				"KipuBank_MontoCero(address)": [
+					{
+						"notice": "Error monto cero"
+					}
+				],
+				"KipuBank_OperacionNoPermitida(address)": [
+					{
+						"notice": "Error por operacion no permitida"
+					}
+				],
+				"KipuBank_OraculoComprometido(uint256)": [
+					{
+						"notice": "Error por óraculo dando un precio equivoco"
+					}
+				],
+				"KipuBank_PrecioDesactualizado(uint256)": [
+					{
+						"notice": "Error por precio desactualizado"
+					}
+				],
+				"KipuBank_SaldoInsuficiente(address,uint256)": [
+					{
+						"notice": "Error por saldo insuficiente"
+					}
+				],
+				"KipuBank_UmbralExcedido(uint256)": [
+					{
+						"notice": "Error por umbral excedido"
+					}
+				],
+				"KipuBank_UmbralInvalido(uint256)": [
+					{
+						"notice": "Error por umbral invalido"
+					}
+				]
+			},
+			"events": {
+				"KipuBank_DepositoRealizado(address,uint256)": {
+					"notice": "Evento para depositos realizado exitosamente"
+				},
+				"KipuBank_ExtraccionRealizada(address,uint256)": {
+					"notice": "Evento para extracciones realizadas exitosamente"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"constructor": {
+					"notice": "Constructor del contrato"
+				},
+				"depositarETH()": {
+					"notice": "Funcion para depositar en la boveda"
+				},
+				"depositarUSDC(uint256)": {
+					"notice": "Funcion para depositar en la boveda"
+				},
+				"i_feed()": {
+					"notice": "Interfaz publica del data feed"
+				},
+				"retirarETH(uint256)": {
+					"notice": "Funcion externa para realizar el retiro de saldo en ETH"
+				},
+				"retirarUSDC(uint256)": {
+					"notice": "Funcion externa para realizar el retiro de saldo en USDC"
+				},
+				"transferirOwner(address)": {
+					"notice": "Función para traspasar el contrato a otro dueño"
+				},
+				"verBoveda()": {
+					"notice": "Funcion para ver el saldo total guardado en el boveda en USD"
+				},
+				"verSaldoETH()": {
+					"notice": "Función para el saldo en ETH del titular"
+				},
+				"verSaldoUSDC()": {
+					"notice": "Función para ver el saldo en USDC del titular"
+				},
+				"verTotalContrato()": {
+					"notice": "Funcion para ver el saldo total del contrato en USD"
+				},
+				"verTotalDepositos()": {
+					"notice": "Funcion para ver la cantidad total de los depositos realizados"
+				},
+				"verTotalRetiros()": {
+					"notice": "Funcion para ver la cantidad total de los retiros realizados"
+				}
+			},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/KipuBank.sol": "KipuBank"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol": {
+			"keccak256": "0x257a8d28fa83d3d942547c8e129ef465e4b5f3f31171e7be4739a4c98da6b4f0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6d39e11b1dc7b9b8ccdabbc9be442ab7cda4a81c748f57e316dcb1bcb4a28bf9",
+				"dweb:/ipfs/QmaG6vz6W6iEUBsbHSBob5mdcitYxWjoygxREHpsJHfWrS"
+			]
+		},
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8ed324d3920bb545059d66ab97d43e43ee85fd3bd52e03e401f020afb0b120f6",
+				"dweb:/ipfs/QmfEckWLmZkDDcoWrkEvMWhms66xwTLff9DDhegYpvHo1a"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC1363.sol": {
+			"keccak256": "0xd5ea07362ab630a6a3dee4285a74cf2377044ca2e4be472755ad64d7c5d4b69d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://da5e832b40fc5c3145d3781e2e5fa60ac2052c9d08af7e300dc8ab80c4343100",
+				"dweb:/ipfs/QmTzf7N5ZUdh5raqtzbM11yexiUoLC9z3Ws632MCuycq1d"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC165.sol": {
+			"keccak256": "0x0afcb7e740d1537b252cb2676f600465ce6938398569f09ba1b9ca240dde2dfc",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1c299900ac4ec268d4570ecef0d697a3013cd11a6eb74e295ee3fbc945056037",
+				"dweb:/ipfs/Qmab9owJoxcA7vJT5XNayCMaUR1qxqj1NDzzisduwaJMcZ"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC20.sol": {
+			"keccak256": "0x1a6221315ce0307746c2c4827c125d821ee796c74a676787762f4778671d4f44",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1bb2332a7ee26dd0b0de9b7fe266749f54820c99ab6a3bcb6f7e6b751d47ee2d",
+				"dweb:/ipfs/QmcRWpaBeCYkhy68PR3B4AgD7asuQk7PwkWxrvJbZcikLF"
+			]
+		},
+		"@openzeppelin/contracts/security/ReentrancyGuard.sol": {
+			"keccak256": "0xa535a5df777d44e945dd24aa43a11e44b024140fc340ad0dfe42acf4002aade1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://41319e7f621f2dc3733511332c4fd032f8e32ad2aa7fd6f665c19741d9941a34",
+				"dweb:/ipfs/QmcYR3bd862GD1Bc7jwrU9bGxrhUu5na1oP964bDCu2id1"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x74ed01eb66b923d0d0cfe3be84604ac04b76482a55f9dd655e1ef4d367f95bc2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5282825a626cfe924e504274b864a652b0023591fa66f06a067b25b51ba9b303",
+				"dweb:/ipfs/QmeCfPykghhMc81VJTrHTC7sF6CRvaA1FXVq2pJhwYp1dV"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+			"keccak256": "0x982c5cb790ab941d1e04f807120a71709d4c313ba0bfc16006447ffbd27fbbd5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8150ceb4ac947e8a442b2a9c017e01e880b2be2dd958f1fa9bc405f4c5a86508",
+				"dweb:/ipfs/QmbcBmFX66AY6Kbhnd5gx7zpkgqnUafo43XnmayAM7zVdB"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6a708e8a5bdb1011c2c381c9a5cfd8a9a956d7d0a9dc1bd8bcdaf52f76ef2f12",
+				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+			"keccak256": "0x8891738ffe910f0cf2da09566928589bf5d63f4524dd734fd9cedbac3274dd5c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://971f954442df5c2ef5b5ebf1eb245d7105d9fbacc7386ee5c796df1d45b21617",
+				"dweb:/ipfs/QmadRjHbkicwqwwh61raUEapaVEtaLMcYbQZWs9gUkgj3u"
+			]
+		},
+		"contracts/KipuBank.sol": {
+			"keccak256": "0xcbac708e42c23a397505192f33f364ee27cd5048dd9815d18c40415285e20559",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d201a34a206adcca0705de8121a83996a9fd2bb1223b7657f3fd38f7269b9138",
+				"dweb:/ipfs/QmdibgLnaHyKq8XVmudZGoYz44p8EY7aFp8RD8RaCJjFYw"
+			]
+		}
+	},
+	"version": 1
+}
