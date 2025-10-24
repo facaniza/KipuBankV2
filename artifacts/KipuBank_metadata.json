@@ -37,6 +37,21 @@
 				"type": "constructor"
 			},
 			{
+				"inputs": [],
+				"name": "EnforcedPause",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "ExpectedPause",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "KipuBank_DireccionInvalida",
+				"type": "error"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -50,6 +65,17 @@
 					}
 				],
 				"name": "KipuBank_ExtraccionRechazada",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "nuevoFeed",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_FeedInvalido",
 				"type": "error"
 			},
 			{
@@ -209,7 +235,45 @@
 				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					},
+					{
 						"indexed": false,
+						"internalType": "uint256",
+						"name": "tiempo",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ContratoDespausado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "tiempo",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ContratoPausado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
 						"internalType": "address",
 						"name": "titular",
 						"type": "address"
@@ -228,7 +292,7 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "titular",
 						"type": "address"
@@ -249,6 +313,25 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "antiguoFeed",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "nuevoFeed",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_FeedActualizado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "previousOwner",
 						"type": "address"
 					},
@@ -260,6 +343,32 @@
 					}
 				],
 				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "Paused",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "Unpaused",
 				"type": "event"
 			},
 			{
@@ -288,11 +397,38 @@
 			},
 			{
 				"inputs": [],
-				"name": "i_feed",
+				"name": "despausarContrato",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "estadoDelContrato",
 				"outputs": [
 					{
-						"internalType": "contract AggregatorV3Interface",
-						"name": "",
+						"internalType": "bool",
+						"name": "pausado",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalContrato",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "limite",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "umbral",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "feedActual",
 						"type": "address"
 					}
 				],
@@ -307,6 +443,26 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pausarContrato",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "paused",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -341,6 +497,32 @@
 					}
 				],
 				"name": "retirarUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "s_feed",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_nuevoFeed",
+						"type": "address"
+					}
+				],
+				"name": "setFeeds",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -456,6 +638,16 @@
 		],
 		"devdoc": {
 			"errors": {
+				"EnforcedPause()": [
+					{
+						"details": "The operation failed because the contract is paused."
+					}
+				],
+				"ExpectedPause()": [
+					{
+						"details": "The operation failed because the contract is not paused."
+					}
+				],
 				"KipuBank_ExtraccionRechazada(address,uint256)": [
 					{
 						"params": {
@@ -564,6 +756,12 @@
 						"monto": "monto que se desea extraer",
 						"titular": "titular que desea realizar la extracción"
 					}
+				},
+				"Paused(address)": {
+					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"Unpaused(address)": {
+					"details": "Emitted when the pause is lifted by `account`."
 				}
 			},
 			"kind": "dev",
@@ -586,6 +784,9 @@
 				"owner()": {
 					"details": "Returns the address of the current owner."
 				},
+				"paused()": {
+					"details": "Returns true if the contract is paused, and false otherwise."
+				},
 				"renounceOwnership()": {
 					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
 				},
@@ -597,6 +798,11 @@
 				"retirarUSDC(uint256)": {
 					"params": {
 						"_monto": "es el monto a retirar de la boveda"
+					}
+				},
+				"setFeeds(address)": {
+					"params": {
+						"_nuevoFeed": "Será la dirección del nuevo data feed del contrato"
 					}
 				},
 				"transferOwnership(address)": {
@@ -646,20 +852,17 @@
 				"HEARTBEAT": {
 					"details": "Por convención se establece en 3600"
 				},
-				"_boveda": {
-					"details": "El total se calcula en USD"
-				},
 				"_totalContrato": {
 					"details": "El total del contrato es en USD"
 				},
 				"i_bankCap": {
 					"details": "Tener en cuenta que el limite global será en USD"
 				},
-				"i_feed": {
-					"details": "Utilizamos el data feed de Chainlink"
-				},
 				"i_usdc": {
 					"details": "Es especifico para el token USDC"
+				},
+				"s_feed": {
+					"details": "Utilizamos el data feed de Chainlink"
 				}
 			},
 			"version": 1
@@ -741,14 +944,26 @@
 				"depositarUSDC(uint256)": {
 					"notice": "Funcion para depositar en la boveda"
 				},
-				"i_feed()": {
-					"notice": "Interfaz publica del data feed"
+				"despausarContrato()": {
+					"notice": "Función para despausar el contrato"
+				},
+				"estadoDelContrato()": {
+					"notice": "Función para ver el estado del contrato"
+				},
+				"pausarContrato()": {
+					"notice": "Función para pausar el contrato"
 				},
 				"retirarETH(uint256)": {
 					"notice": "Funcion externa para realizar el retiro de saldo en ETH"
 				},
 				"retirarUSDC(uint256)": {
 					"notice": "Funcion externa para realizar el retiro de saldo en USDC"
+				},
+				"s_feed()": {
+					"notice": "Interfaz publica del data feed"
+				},
+				"setFeeds(address)": {
+					"notice": "Función para cambiar el data feeds"
 				},
 				"transferirOwner(address)": {
 					"notice": "Función para traspasar el contrato a otro dueño"
@@ -863,6 +1078,14 @@
 				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
 			]
 		},
+		"@openzeppelin/contracts/utils/Pausable.sol": {
+			"keccak256": "0xdb484371dfbb848cb6f5d70464e9ac9b2900e4164ead76bbce4fef0b44bcc68f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f9d6f6f6600a2bec622f699081b58350873b5e63ce05464d17d674a290bb8a7c",
+				"dweb:/ipfs/QmQKVzSQY1PM3Bid4QhgVVZyx6B4Jx7XgaQzLKHj38vJz8"
+			]
+		},
 		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
 			"keccak256": "0x8891738ffe910f0cf2da09566928589bf5d63f4524dd734fd9cedbac3274dd5c",
 			"license": "MIT",
@@ -872,11 +1095,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xcbac708e42c23a397505192f33f364ee27cd5048dd9815d18c40415285e20559",
+			"keccak256": "0xefa8eec7f65cc406839f9ea3556b1a42a328ba5192246b2550db163fc6e7f443",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d201a34a206adcca0705de8121a83996a9fd2bb1223b7657f3fd38f7269b9138",
-				"dweb:/ipfs/QmdibgLnaHyKq8XVmudZGoYz44p8EY7aFp8RD8RaCJjFYw"
+				"bzz-raw://83da17d1a882fc9def0b428fa962c56aceb7673ba21a15dff6f53365f7829e41",
+				"dweb:/ipfs/QmVvPR8s1d1mCrVHuAkafjuFtcG1zznFYBXptjGZQA61uK"
 			]
 		}
 	},
