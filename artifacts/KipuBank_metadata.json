@@ -38,6 +38,27 @@
 			},
 			{
 				"inputs": [],
+				"name": "AccessControlBadConfirmation",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "neededRole",
+						"type": "bytes32"
+					}
+				],
+				"name": "AccessControlUnauthorizedAccount",
+				"type": "error"
+			},
+			{
+				"inputs": [],
 				"name": "EnforcedPause",
 				"type": "error"
 			},
@@ -125,6 +146,17 @@
 					}
 				],
 				"name": "KipuBank_MontoCero",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_NoAutorizado",
 				"type": "error"
 			},
 			{
@@ -332,6 +364,63 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "ownerViejo",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "ownerNuevo",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_OwnerTransferido",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "cuenta",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "rol",
+						"type": "bytes32"
+					}
+				],
+				"name": "KipuBank_RolDado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "cuenta",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes32",
+						"name": "rol",
+						"type": "bytes32"
+					}
+				],
+				"name": "KipuBank_RolRevocado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "previousOwner",
 						"type": "address"
 					},
@@ -362,6 +451,81 @@
 				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "previousAdminRole",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "newAdminRole",
+						"type": "bytes32"
+					}
+				],
+				"name": "RoleAdminChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleGranted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleRevoked",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
 						"indexed": false,
 						"internalType": "address",
 						"name": "account",
@@ -374,6 +538,87 @@
 			{
 				"stateMutability": "payable",
 				"type": "fallback"
+			},
+			{
+				"inputs": [],
+				"name": "DEFAULT_ADMIN_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "FEED_MANAGER",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "PAUSER",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "titular",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					}
+				],
+				"name": "balanceOf",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "cuenta",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "rol",
+						"type": "bytes32"
+					}
+				],
+				"name": "darRol",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			},
 			{
 				"inputs": [],
@@ -436,6 +681,67 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					}
+				],
+				"name": "getRoleAdmin",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "grantRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "hasRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "owner",
 				"outputs": [
@@ -478,6 +784,24 @@
 			{
 				"inputs": [
 					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "callerConfirmation",
+						"type": "address"
+					}
+				],
+				"name": "renounceRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint256",
 						"name": "_monto",
 						"type": "uint256"
@@ -497,6 +821,42 @@
 					}
 				],
 				"name": "retirarUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "cuenta",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "rol",
+						"type": "bytes32"
+					}
+				],
+				"name": "revocarRol",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "revokeRole",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -525,6 +885,25 @@
 				"name": "setFeeds",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes4",
+						"name": "interfaceId",
+						"type": "bytes4"
+					}
+				],
+				"name": "supportsInterface",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -638,6 +1017,16 @@
 		],
 		"devdoc": {
 			"errors": {
+				"AccessControlBadConfirmation()": [
+					{
+						"details": "The caller of a function is not the expected one. NOTE: Don't confuse with {AccessControlUnauthorizedAccount}."
+					}
+				],
+				"AccessControlUnauthorizedAccount(address,bytes32)": [
+					{
+						"details": "The `account` is missing a role."
+					}
+				],
 				"EnforcedPause()": [
 					{
 						"details": "The operation failed because the contract is paused."
@@ -653,6 +1042,13 @@
 						"params": {
 							"monto": "monto a extraer de la boveda",
 							"titular": "titular de la cuenta a realizar la extracción"
+						}
+					}
+				],
+				"KipuBank_FeedInvalido(address)": [
+					{
+						"params": {
+							"nuevoFeed": "Es el data feed erroneo que quiso ser ingresado"
 						}
 					}
 				],
@@ -745,6 +1141,18 @@
 				]
 			},
 			"events": {
+				"KipuBank_ContratoDespausado(address,uint256)": {
+					"params": {
+						"sender": "Es la direccion que despausó el contrato",
+						"tiempo": "Es el tiempo en el que fue despausado"
+					}
+				},
+				"KipuBank_ContratoPausado(address,uint256)": {
+					"params": {
+						"sender": "Es la dirección que pauso el contrato",
+						"tiempo": "Es el tiempo en el que fue pausado el contrato"
+					}
+				},
 				"KipuBank_DepositoRealizado(address,uint256)": {
 					"params": {
 						"monto": "monto que se desea depositar",
@@ -757,8 +1165,23 @@
 						"titular": "titular que desea realizar la extracción"
 					}
 				},
+				"KipuBank_FeedActualizado(address,address)": {
+					"params": {
+						"antiguoFeed": "Es el antiguo data feed utilizado",
+						"nuevoFeed": "Es el nuevo data feed a ser utilizado"
+					}
+				},
 				"Paused(address)": {
 					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"RoleAdminChanged(bytes32,bytes32,bytes32)": {
+					"details": "Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole` `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite {RoleAdminChanged} not being emitted to signal this."
+				},
+				"RoleGranted(bytes32,address,address)": {
+					"details": "Emitted when `account` is granted `role`. `sender` is the account that originated the contract call. This account bears the admin role (for the granted role). Expected in cases where the role was granted using the internal {AccessControl-_grantRole}."
+				},
+				"RoleRevoked(bytes32,address,address)": {
+					"details": "Emitted when `account` is revoked `role`. `sender` is the account that originated the contract call:   - if using `revokeRole`, it is the admin role bearer   - if using `renounceRole`, it is the role bearer (i.e. `account`)"
 				},
 				"Unpaused(address)": {
 					"details": "Emitted when the pause is lifted by `account`."
@@ -766,6 +1189,15 @@
 			},
 			"kind": "dev",
 			"methods": {
+				"balanceOf(address,address)": {
+					"params": {
+						"titular": "Es el titular de la cuenta",
+						"token": "Es el token que se desea consultar"
+					},
+					"returns": {
+						"_0": "Retorna un entero sin signo, que es el saldo correspondiente"
+					}
+				},
 				"constructor": {
 					"details": "Se deben generar el limite, umbral y las direcciones del data feed y el token a utilizar al momento de desplegar el contrato",
 					"params": {
@@ -781,6 +1213,15 @@
 				"depositarUSDC(uint256)": {
 					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no Ether"
 				},
+				"getRoleAdmin(bytes32)": {
+					"details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+				},
+				"grantRole(bytes32,address)": {
+					"details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleGranted} event."
+				},
+				"hasRole(bytes32,address)": {
+					"details": "Returns `true` if `account` has been granted `role`."
+				},
 				"owner()": {
 					"details": "Returns the address of the current owner."
 				},
@@ -789,6 +1230,9 @@
 				},
 				"renounceOwnership()": {
 					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+				},
+				"renounceRole(bytes32,address)": {
+					"details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `callerConfirmation`. May emit a {RoleRevoked} event."
 				},
 				"retirarETH(uint256)": {
 					"params": {
@@ -799,6 +1243,9 @@
 					"params": {
 						"_monto": "es el monto a retirar de la boveda"
 					}
+				},
+				"revokeRole(bytes32,address)": {
+					"details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleRevoked} event."
 				},
 				"setFeeds(address)": {
 					"params": {
@@ -852,6 +1299,9 @@
 				"HEARTBEAT": {
 					"details": "Por convención se establece en 3600"
 				},
+				"_cuentasMultiToken": {
+					"details": "En el primer mapping tenemos la direcciones del token, en el segundo mapping tenemos las direcciones de los titulares"
+				},
 				"_totalContrato": {
 					"details": "El total del contrato es en USD"
 				},
@@ -869,9 +1319,19 @@
 		},
 		"userdoc": {
 			"errors": {
+				"KipuBank_DireccionInvalida()": [
+					{
+						"notice": "Error por querer hacer un \"set\" de una dirección invalida"
+					}
+				],
 				"KipuBank_ExtraccionRechazada(address,uint256)": [
 					{
 						"notice": "Error de extraccion"
+					}
+				],
+				"KipuBank_FeedInvalido(address)": [
+					{
+						"notice": "Error por querer ingresar un data feed invalido"
 					}
 				],
 				"KipuBank_InicializacionInvalida(uint256,uint256)": [
@@ -926,15 +1386,27 @@
 				]
 			},
 			"events": {
+				"KipuBank_ContratoDespausado(address,uint256)": {
+					"notice": "Evento para despausar el contrato"
+				},
+				"KipuBank_ContratoPausado(address,uint256)": {
+					"notice": "Evento para pausar el contrato"
+				},
 				"KipuBank_DepositoRealizado(address,uint256)": {
 					"notice": "Evento para depositos realizado exitosamente"
 				},
 				"KipuBank_ExtraccionRealizada(address,uint256)": {
 					"notice": "Evento para extracciones realizadas exitosamente"
+				},
+				"KipuBank_FeedActualizado(address,address)": {
+					"notice": "Evento para la actualización del feed"
 				}
 			},
 			"kind": "user",
 			"methods": {
+				"balanceOf(address,address)": {
+					"notice": "Función para ver el saldo por token del titular"
+				},
 				"constructor": {
 					"notice": "Constructor del contrato"
 				},
@@ -964,6 +1436,9 @@
 				},
 				"setFeeds(address)": {
 					"notice": "Función para cambiar el data feeds"
+				},
+				"supportsInterface(bytes4)": {
+					"notice": "Override requerido por Solidity para la múltiple herencia"
 				},
 				"transferirOwner(address)": {
 					"notice": "Función para traspasar el contrato a otro dueño"
@@ -1012,6 +1487,22 @@
 			"urls": [
 				"bzz-raw://6d39e11b1dc7b9b8ccdabbc9be442ab7cda4a81c748f57e316dcb1bcb4a28bf9",
 				"dweb:/ipfs/QmaG6vz6W6iEUBsbHSBob5mdcitYxWjoygxREHpsJHfWrS"
+			]
+		},
+		"@openzeppelin/contracts/access/AccessControl.sol": {
+			"keccak256": "0x1a6b4f6b7798ab80929d491b89d5427a9b3338c0fd1acd0ba325f69c6f1646af",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7bb7f346c12a14dc622bc105ce3c47202fbc89f4b153a28a63bb68193297330c",
+				"dweb:/ipfs/QmagwF8P3bUBXwdo159ueEnY9dLSvEWwK24kk2op58egwG"
+			]
+		},
+		"@openzeppelin/contracts/access/IAccessControl.sol": {
+			"keccak256": "0xbff9f59c84e5337689161ce7641c0ef8e872d6a7536fbc1f5133f128887aba3c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b308f882e796f7b79c9502deacb0a62983035c6f6f4e962b319ba6a1f4a77d3d",
+				"dweb:/ipfs/QmaWCW7ahEQqFjwhSUhV7Ae7WhfNvzSpE7DQ58hvEooqPL"
 			]
 		},
 		"@openzeppelin/contracts/access/Ownable.sol": {
@@ -1086,6 +1577,14 @@
 				"dweb:/ipfs/QmQKVzSQY1PM3Bid4QhgVVZyx6B4Jx7XgaQzLKHj38vJz8"
 			]
 		},
+		"@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+			"keccak256": "0x2d9dc2fe26180f74c11c13663647d38e259e45f95eb88f57b61d2160b0109d3e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://81233d1f98060113d9922180bb0f14f8335856fe9f339134b09335e9f678c377",
+				"dweb:/ipfs/QmWh6R35SarhAn4z2wH8SU456jJSYL2FgucfTFgbHJJN4E"
+			]
+		},
 		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
 			"keccak256": "0x8891738ffe910f0cf2da09566928589bf5d63f4524dd734fd9cedbac3274dd5c",
 			"license": "MIT",
@@ -1095,11 +1594,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xefa8eec7f65cc406839f9ea3556b1a42a328ba5192246b2550db163fc6e7f443",
+			"keccak256": "0xa84997cd83511a6b46b8e3df00d2aac1baac022628be4c38c7e60c2df7305538",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://83da17d1a882fc9def0b428fa962c56aceb7673ba21a15dff6f53365f7829e41",
-				"dweb:/ipfs/QmVvPR8s1d1mCrVHuAkafjuFtcG1zznFYBXptjGZQA61uK"
+				"bzz-raw://ced018ca7059a2504c591d7e9bc877022ad6121b07fdb15dc7afb63942c967e9",
+				"dweb:/ipfs/QmTDdP93VV7SZdkgdA1Ux8vXHQpNeRgvWwQj3acTbauFCY"
 			]
 		}
 	},

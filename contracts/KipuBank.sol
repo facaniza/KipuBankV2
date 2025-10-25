@@ -6,19 +6,26 @@ pragma solidity ^0.8.30;
     /// @author Facundo Alejandro Caniza
 
 /// @notice Importaciones de OpenZeppelin
-/// @dev Se debe importar las librerias/contratos ReentrancyGuard, IERC20, SafeIERC, Ownable y Pausable
+/// @dev Se debe importar las librerias/contratos ReentrancyGuard, IERC20, SafeIERC, Ownable, Pausable y AccesControl
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @notice Importación de interfaz de Chainlink
 /// @dev Usamos la importación de Data Feeds
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
-contract KipuBank is ReentrancyGuard, Ownable, Pausable {
+contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
+
+    bytes32 public constant PAUSER = keccak256("PAUSER");
+
+    bytes32 public constant FEED_MANAGER = keccak256("FEED_MANAGER");
+
+    /// @notice Se usa la interfaz SafeERC20 para ampliar una funcionalidad segura en IERC20
     /// @dev Se amplia funcionalidad segura al IERC20
     using SafeERC20 for IERC20;
 
@@ -55,7 +62,9 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @dev El total del contrato es en USD
     uint private _totalContrato = 0;
 
+
     /// @notice Estructura que almacena por titular el monto que posee en los diferentes tokens
+    /// @dev En el primer mapping tenemos la direcciones del token, en el segundo mapping tenemos las direcciones de los titulares
     mapping (address token => mapping (address titular => uint monto)) private _cuentasMultiToken;
 
 
@@ -69,11 +78,26 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @param monto monto que se desea extraer
     event KipuBank_ExtraccionRealizada(address indexed titular, uint monto);
 
+    /// @notice Evento para la actualización del feed
+    /// @param antiguoFeed Es el antiguo data feed utilizado
+    /// @param nuevoFeed Es el nuevo data feed a ser utilizado
     event KipuBank_FeedActualizado(address indexed antiguoFeed, address indexed nuevoFeed);
 
+    /// @notice Evento para pausar el contrato
+    /// @param sender Es la dirección que pauso el contrato
+    /// @param tiempo Es el tiempo en el que fue pausado el contrato
     event KipuBank_ContratoPausado(address indexed sender, uint tiempo);
 
+    /// @notice Evento para despausar el contrato
+    /// @param sender Es la direccion que despausó el contrato
+    /// @param tiempo Es el tiempo en el que fue despausado
     event KipuBank_ContratoDespausado(address indexed sender, uint tiempo);
+
+    event KipuBank_OwnerTransferido( address indexed ownerViejo, address indexed ownerNuevo);
+
+    event KipuBank_RolDado(address indexed cuenta, bytes32 rol);
+
+    event KipuBank_RolRevocado(address indexed cuenta, bytes32 rol);
 
     /// @notice Error de extraccion
     /// @param titular titular de la cuenta a realizar la extracción
@@ -122,9 +146,14 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @param precio Es el precio que quedó desactualizado
     error KipuBank_PrecioDesactualizado(uint precio);
 
+    /// @notice Error por querer hacer un "set" de una dirección invalida
     error KipuBank_DireccionInvalida();
 
+    /// @notice Error por querer ingresar un data feed invalido
+    /// @param nuevoFeed Es el data feed erroneo que quiso ser ingresado
     error KipuBank_FeedInvalido(address nuevoFeed);
+
+    error KipuBank_NoAutorizado(address sender);
 
     /// @notice Constructor del contrato
     /// @param _limite Limite global que se permite por transaccion
@@ -132,12 +161,23 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @param _feed Direccion del data feed a utlizar
     /// @param _tokenERC20 Direccion del token ERC20 a utilizar
     /// @dev Se deben generar el limite, umbral y las direcciones del data feed y el token a utilizar al momento de desplegar el contrato
-    constructor(uint _limite, uint _umbral, address _owner, address _feed, address _tokenERC20) Ownable(_owner) {
+    constructor(
+        uint _limite, 
+        uint _umbral, 
+        address _owner, 
+        address _feed, 
+        address _tokenERC20) 
+        Ownable(_owner) {
         if(_limite == 0) revert KipuBank_LimiteInvalido(_limite);
         if(_umbral == 0) revert KipuBank_UmbralInvalido(_umbral);
         if(_umbral > _limite) revert KipuBank_InicializacionInvalida(_limite, _umbral);
-        if(_feed == address(0)) revert(); // error direccion de feeder invalida
-        if(_tokenERC20 == address(0)) revert(); // error direccion de token invalida
+        if(_feed == address(0)) revert KipuBank_DireccionInvalida();
+        if(_tokenERC20 == address(0)) revert KipuBank_DireccionInvalida();
+        
+        _grantRole(DEFAULT_ADMIN_ROLE, _owner);
+        _grantRole(PAUSER, _owner);
+        _grantRole(FEED_MANAGER, _owner);
+
         i_usdc = IERC20(_tokenERC20);
         s_feed = AggregatorV3Interface(_feed);
         i_bankCap = _limite;
@@ -152,21 +192,17 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @dev El contrato no puede enviar data de manera no autorizada
     fallback() external payable { revert KipuBank_OperacionNoPermitida(msg.sender); }
 
-    /// @notice Función para realizar la consulta del precio mediante óraculo
-    /// @return precioUSD_ Retorna el precio en USD
-    /// @dev Usamos el óraculo de ChainLink
-    function chainLinkFeeds() internal view returns(uint precioUSD_) {
-        (, int256 ethUSDPrice,, uint256 updateAt,) = s_feed.latestRoundData();
-        if( ethUSDPrice <= 0) revert KipuBank_OraculoComprometido(uint(ethUSDPrice));
-        if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_PrecioDesactualizado(uint(ethUSDPrice));
-
-        precioUSD_ = uint(ethUSDPrice);
-    }
+    modifier soloOwnerORol(bytes32 role) {
+        if(owner() != msg.sender || !hasRole(role, msg.sender)) {
+            revert KipuBank_NoAutorizado(msg.sender);
+        }
+        _;
+    }    
 
     /// @notice Modificador para verificar los depositos
     /// @param _monto es el monto a verificar
     modifier verificarDepositoETH(uint _monto) {
-        uint montoUSDC = convertirEthEnUSDC(_monto);
+        uint montoUSDC = convertirEthEnUSD(_monto);
         if(montoUSDC == 0) revert KipuBank_MontoCero(msg.sender);
         if (montoUSDC + _totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(montoUSDC);
         _;
@@ -184,7 +220,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @param _monto monto a verificar para el retiro
     /// @dev El umbral solo se aplica a los retiros de boveda
     modifier verificarRetiroETH(uint _monto) {
-        uint montoUSDC = convertirEthEnUSDC(_monto);
+        uint montoUSDC = convertirEthEnUSD(_monto);
         if(montoUSDC == 0) revert KipuBank_MontoCero(msg.sender);
         if (montoUSDC > i_umbral) revert KipuBank_UmbralExcedido(montoUSDC);
         if (_monto > _cuentasMultiToken[address(0)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, montoUSDC);
@@ -201,17 +237,36 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
         _;
     }    
 
+    /// @notice Función para realizar la consulta del precio mediante óraculo
+    /// @return precioUSD_ Retorna el precio en USD
+    /// @dev Usamos el óraculo de ChainLink
+    function chainLinkFeeds() internal view returns(uint precioUSD_) {
+        (, int256 ethUSDPrice,, uint256 updateAt,) = s_feed.latestRoundData();
+        if( ethUSDPrice <= 0) revert KipuBank_OraculoComprometido(uint(ethUSDPrice));
+        if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_PrecioDesactualizado(uint(ethUSDPrice));
+
+        precioUSD_ = uint(ethUSDPrice);
+    }
+
+    /// @notice Funcion para convertir ETH en USDC
+    /// @param _monto Es el monto ingresado a convertir
+    /// @return montoConvertido_ Es el monto una vez convertido a USD
+    /// @dev La cuenta debe hacerse debido a que los decimales de USDC y ETH no son los mismos, por lo tanto, se nivelan las bases
+    function convertirEthEnUSD(uint _monto) internal view returns (uint montoConvertido_) {
+            montoConvertido_ = (_monto * chainLinkFeeds()) / DECIMAL_FACTOR;
+    }    
+
     /// @notice Funcion privada para realizar el retiro efectivo de fondos en ETH
     /// @param _monto recibe el monto a retirar de la boveda
     /// @dev Se actualiza el estado antes de la transferencia para aplicar el patrón CEI
     /// @dev Se utiliza la funcion de OpenZeppelin para el nonReentrant
     function _retirarFondosETH(uint _monto) private nonReentrant verificarRetiroETH(_monto) {
-        uint montoUSDC = convertirEthEnUSDC(_monto);
+        uint montoUSD = convertirEthEnUSD(_monto);
         _cuentasMultiToken[address(0)][msg.sender] -= _monto;
         _retiros++;
-        _totalContrato -= montoUSDC;
+        _totalContrato -= montoUSD;
         
-        emit KipuBank_ExtraccionRealizada(msg.sender, montoUSDC);
+        emit KipuBank_ExtraccionRealizada(msg.sender, montoUSD);
 
         (bool success, ) = payable(msg.sender).call{value: _monto}("");
         if (!success) revert KipuBank_ExtraccionRechazada(msg.sender, _monto);
@@ -246,11 +301,11 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @notice Funcion para depositar en la boveda
     /// @dev Es payable y usa el modificador de verificarDepositos
     function depositarETH() external payable verificarDepositoETH(msg.value) whenNotPaused {
-        uint montoUSDC = convertirEthEnUSDC(msg.value);
+        uint montoUSD = convertirEthEnUSD(msg.value);
         _cuentasMultiToken[address(0)][msg.sender] += msg.value;
         _depositos++;
-        _totalContrato += montoUSDC;
-        emit KipuBank_DepositoRealizado(msg.sender, montoUSDC);
+        _totalContrato += montoUSD;
+        emit KipuBank_DepositoRealizado(msg.sender, montoUSD);
     }
 
     /// @notice Funcion para depositar en la boveda
@@ -265,18 +320,11 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
         i_usdc.safeTransferFrom(msg.sender, address(this), _monto);
     }
     
-    /// @notice Funcion para convertir ETH en USDC
-    /// @param _monto Es el monto ingresado a convertir
-    /// @return montoConvertido_ Es el monto una vez convertido a USD
-    /// @dev La cuenta debe hacerse debido a que los decimales de USDC y ETH no son los mismos, por lo tanto, se nivelan las bases
-    function convertirEthEnUSDC(uint _monto) internal view returns (uint montoConvertido_) {
-            montoConvertido_ = (_monto * chainLinkFeeds()) / DECIMAL_FACTOR;
-    }
 
     /// @notice Funcion para ver el saldo total guardado en el boveda en USD
     /// @return monto_ devuelve el saldo depositado total en USD depositado por cada titular
     function verBoveda() external view returns (uint monto_) {
-        monto_ = convertirEthEnUSDC(_cuentasMultiToken[address(0)][msg.sender]) + _cuentasMultiToken[address(i_usdc)][msg.sender];
+        monto_ = convertirEthEnUSD(_cuentasMultiToken[address(0)][msg.sender]) + _cuentasMultiToken[address(i_usdc)][msg.sender];
     }
 
     /// @notice Función para ver el saldo en USDC del titular
@@ -313,14 +361,27 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     /// @param _nuevoOwner Será la dirección del nuevo propietario del contrato
     /// @dev El modificador de onlyOwner es necesario para seguridad
     function transferirOwner(address _nuevoOwner) external onlyOwner whenPaused {
-        transferOwnership(_nuevoOwner);
+        
+        address ownerActual = owner();
+
+        _revokeRole(DEFAULT_ADMIN_ROLE, ownerActual);
+        _revokeRole(PAUSER, ownerActual);
+        _revokeRole(FEED_MANAGER, ownerActual);
+
+        _transferOwnership(_nuevoOwner);
+
+        _grantRole(DEFAULT_ADMIN_ROLE, _nuevoOwner);
+        _grantRole(FEED_MANAGER, _nuevoOwner);
+        _grantRole(PAUSER, _nuevoOwner);
+
+        emit KipuBank_OwnerTransferido(ownerActual, _nuevoOwner);
     }
 
     /// @notice Función para cambiar el data feeds
     /// @param _nuevoFeed Será la dirección del nuevo data feed del contrato
-    function setFeeds(address _nuevoFeed) external onlyOwner whenPaused {
+    function setFeeds(address _nuevoFeed) external soloOwnerORol(FEED_MANAGER) whenPaused {
         if (_nuevoFeed == address(0)) revert KipuBank_DireccionInvalida();
-        // Intentamos llamar al nuevo feed para verificar que funciona
+
         try AggregatorV3Interface(_nuevoFeed).latestRoundData() returns (
             uint80, int256 price, uint256, uint256 updateAt, uint80
         ) {
@@ -337,19 +398,37 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
     }
 
     /// @notice Función para pausar el contrato
-    function pausarContrato() external onlyOwner whenNotPaused {
+    function pausarContrato() external soloOwnerORol(PAUSER) whenNotPaused {
         _pause();
         emit KipuBank_ContratoPausado(msg.sender, block.timestamp);
     }
 
     /// @notice Función para despausar el contrato
-    function despausarContrato() external onlyOwner whenPaused {
+    function despausarContrato() external soloOwnerORol(PAUSER) whenPaused {
         _unpause();
         emit KipuBank_ContratoDespausado(msg.sender, block.timestamp);
     }
 
+    function darRol(address cuenta, bytes32 rol) external onlyOwner {
+        grantRole(rol, cuenta);
+        emit KipuBank_RolDado(cuenta, rol);
+    }
+
+    function revocarRol(address cuenta, bytes32 rol) external onlyOwner {
+        revokeRole(rol, cuenta);
+        emit KipuBank_RolRevocado(cuenta, rol);
+    }
+
+
     /// @notice Función para ver el estado del contrato
-    function estadoDelContrato() external view returns (bool pausado, uint totalContrato, uint limite, uint umbral, address feedActual) {
+    function estadoDelContrato() external view 
+    returns (
+        bool pausado, 
+        uint totalContrato, 
+        uint limite, 
+        uint umbral, 
+        address feedActual
+        ) {
         return (
             paused(),
             _totalContrato,
@@ -357,6 +436,26 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable {
             i_umbral,
             address(s_feed)
         );
+    }    
+
+    /// @notice Función para ver el saldo por token del titular
+    /// @param titular Es el titular de la cuenta
+    /// @param token Es el token que se desea consultar
+    /// @return Retorna un entero sin signo, que es el saldo correspondiente
+    function balanceOf(address titular, address token) external view returns (uint) {
+        return _cuentasMultiToken[token][titular];
+    }
+
+
+    /// @notice Override requerido por Solidity para la múltiple herencia
+    function supportsInterface(bytes4 interfaceId) 
+        public 
+        view 
+        virtual 
+        override(AccessControl) 
+        returns (bool) 
+    {
+        return super.supportsInterface(interfaceId);
     }
 
 }
