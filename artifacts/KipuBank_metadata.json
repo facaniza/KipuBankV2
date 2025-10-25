@@ -1242,7 +1242,7 @@
 					"details": "Es payable y usa el modificador de verificarDepositos"
 				},
 				"depositarUSDC(uint256)": {
-					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no Ether"
+					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no EtherNecesitamos la aprobación del dueño de los USDC para depositar"
 				},
 				"despausarContrato()": {
 					"details": "Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER"
@@ -1664,11 +1664,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xe6a6587eefaf51f0ec02bc0b87acd61483cd62ca9eb5f50388cb47dd1906de0c",
+			"keccak256": "0x92413ad7063c88bc7329fcce187ccfc66f9204fa7fe4286e045ff82abd440eb2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8545849778d11bbf3cb30479a647f312b32e65a317ef031fc44f4c17b98d6dc1",
-				"dweb:/ipfs/QmRXNNT2fwtWVo3jo99ZU4zNyQ3pgYRpreMiVou9cck1vb"
+				"bzz-raw://2c53925fe916fae45b5c43f452ad25ee5a1dac8c837679648a5ddd7ea1257cf8",
+				"dweb:/ipfs/QmaffyECrC2CiUPFbAdiEySjNZk1926wUonCWrTKbFKHt7"
 			]
 		}
 	},

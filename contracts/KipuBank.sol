@@ -295,7 +295,6 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
         _cuentasMultiToken[address(i_usdc)][msg.sender] -= _monto;
         _retiros++;
         _totalContrato -= _monto;
-        
         emit KipuBank_ExtraccionRealizada(msg.sender, _monto);
         i_usdc.safeTransfer(msg.sender, _monto);
     }
@@ -326,7 +325,10 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev Es payable y usa el modificador de verificarDepositos
     /// @dev Se utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20
     /// @dev No se marca como payable ya que es un token ERC20 y no Ether
+    /// @dev Necesitamos la aprobación del dueño de los USDC para depositar
     function depositarUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
+        i_usdc.approve(address(this), _monto);
+        i_usdc.allowance(msg.sender, address(this));
         _cuentasMultiToken[address(i_usdc)][msg.sender] += _monto;
         _depositos++;
         _totalContrato += _monto;
