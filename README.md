@@ -40,9 +40,10 @@ Los límites globales (`bankCap`) y de retiro (`umbral`) se definen en el **cons
 | `retirarETH(uint256 monto)` | `external` | Retira Ether si el monto no supera el umbral ni el saldo personal. |
 | `depositarUSDC(uint256 monto)` | `external` | Deposita tokens USDC al contrato usando la interfaz `IERC20`. |
 | `retirarUSDC(uint256 monto)` | `external` | Envía USDC de vuelta al usuario, respetando umbral y saldo. |
-| `verBovedaETH()` | `view` | Devuelve el saldo ETH del usuario. |
-| `verBovedaUSDC()` | `view` | Devuelve el saldo USDC del usuario. |
+| `verSaldoETH()` | `view` | Devuelve el saldo ETH del usuario. |
+| `verSaldoUSDC()` | `view` | Devuelve el saldo USDC del usuario. |
 | `verTotalContrato()` | `view` | Devuelve el total combinado de ETH y USDC dentro del contrato. |
+| `balanceOf(address titular, address token)` | `view` | Función para ver de los distintos balances en una única función. |
 
 ---
 
