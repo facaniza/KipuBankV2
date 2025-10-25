@@ -26,17 +26,17 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @notice Rol de Manager de los data feeds
     bytes32 public constant FEED_MANAGER = keccak256("FEED_MANAGER");
 
-    /// @notice Se usa la interfaz SafeERC20 para ampliar una funcionalidad segura en IERC20
-    /// @dev Se amplia funcionalidad segura al IERC20
-    using SafeERC20 for IERC20;
-
-    /// @notice Direccion del Token ERC20
-    /// @dev Es especifico para el token USDC
-    IERC20 immutable i_usdc;
-
     /// @notice Interfaz publica del data feed
     /// @dev Utilizamos el data feed de Chainlink
     AggregatorV3Interface public s_feed;
+
+    /// @notice Direccion del Token ERC20
+    /// @dev Es especifico para el token USDC
+    IERC20 immutable i_usdc;    
+
+    /// @notice Se usa la interfaz SafeERC20 para ampliar una funcionalidad segura en IERC20
+    /// @dev Se amplia funcionalidad segura al IERC20
+    using SafeERC20 for IERC20;
 
     /// @notice Constante de refresco del precio del data feed
     /// @dev Por convención se establece en 3600
@@ -53,21 +53,19 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev Tener en cuenta que el limite global será en USD
     uint immutable i_bankCap;
 
-    /// @notice Cantidad de depositos del contrato
-    uint private _depositos = 0;
-
-    /// @notice Cantidad de retiros del contrato
-    uint private _retiros = 0;
-
     /// @notice Total de ether depositado en el contrato
     /// @dev El total del contrato es en USD
-    uint private _totalContrato = 0;
+    uint private s_totalContrato = 0;
 
+    /// @notice Cantidad de depositos del contrato
+    uint128 private s_depositos = 0;
+
+    /// @notice Cantidad de retiros del contrato
+    uint128 private s_retiros = 0;    
 
     /// @notice Estructura que almacena por titular el monto que posee en los diferentes tokens
     /// @dev En el primer mapping tenemos la direcciones del token, en el segundo mapping tenemos las direcciones de los titulares
-    mapping (address token => mapping (address titular => uint monto)) private _cuentasMultiToken;
-
+    mapping (address token => mapping (address titular => uint monto)) private s_cuentasMultiToken;
 
     /// @notice Evento para depositos realizado exitosamente
     /// @param titular titular que realiza el detposito
@@ -108,11 +106,6 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param cuenta Es la cuenta a la que se revoca el rol
     /// @param rol Es el rol que se elimina de la cuenta
     event KipuBank_RolRevocado(address indexed cuenta, bytes32 rol);
-
-    /// @notice Evento para aprobar depósito de monto en USDC
-    /// @param cuenta Es la cuenta que va a autorizar
-    /// @param monto Es el monto autorizado
-    event KipuBank_MontoAprobado(address indexed cuenta, uint monto);
 
     /// @notice Error de extraccion
     /// @param titular titular de la cuenta a realizar la extracción
@@ -172,6 +165,10 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param sender Es la cuenta que quiso acceder a la función
     error KipuBank_NoAutorizado(address sender);
 
+    /// @notice Error de monto no autorizado a depositar
+    /// @param monto Monto excedido
+    error KipuBank_MontoNoAutorizado(uint monto);
+
     /// @notice Constructor del contrato
     /// @param _limite Limite global que se permite por transaccion
     /// @param _umbral Umbral de limite de retiros
@@ -212,18 +209,17 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @notice Modificador para que administrar el acceso a la funciones, solo por Rol o por Owner
     /// @param rol Es el rol que tiene permise a acceder a la función
     modifier soloOwnerORol(bytes32 rol) {
-        if(owner() != msg.sender || !hasRole(rol, msg.sender)) {
+        if(owner() != msg.sender && !hasRole(rol, msg.sender)) {
             revert KipuBank_NoAutorizado(msg.sender);
         }
         _;
     }    
 
     /// @notice Modificador para verificar los depositos
-    /// @param _monto es el monto a verificar
-    modifier verificarDepositoETH(uint _monto) {
-        uint montoUSDC = convertirEthEnUSD(_monto);
-        if(montoUSDC == 0) revert KipuBank_MontoCero(msg.sender);
-        if (montoUSDC + _totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(montoUSDC);
+    /// @param _montoUSD es el monto a verificar
+    modifier verificarDepositoETH(uint _montoUSD) {
+        if(_montoUSD == 0) revert KipuBank_MontoCero(msg.sender);
+        if (_montoUSD + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_montoUSD);
         _;
     }
 
@@ -231,7 +227,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param _monto es el monto a verificar
     modifier verificarDepositoUSDC(uint _monto) {
         if(_monto == 0) revert KipuBank_MontoCero(msg.sender);
-        if (_monto + _totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_monto);
+        if (_monto + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_monto);
         _;
     }    
 
@@ -242,7 +238,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
         uint montoUSDC = convertirEthEnUSD(_monto);
         if(montoUSDC == 0) revert KipuBank_MontoCero(msg.sender);
         if (montoUSDC > i_umbral) revert KipuBank_UmbralExcedido(montoUSDC);
-        if (_monto > _cuentasMultiToken[address(0)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, montoUSDC);
+        if (_monto > s_cuentasMultiToken[address(0)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, montoUSDC);
         _;
     }
 
@@ -252,7 +248,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     modifier verificarRetiroUSDC(uint _monto) {
         if(_monto == 0) revert KipuBank_MontoCero(msg.sender);
         if (_monto > i_umbral) revert KipuBank_UmbralExcedido(_monto);
-        if (_monto > _cuentasMultiToken[address(i_usdc)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, _monto);
+        if (_monto > s_cuentasMultiToken[address(i_usdc)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, _monto);
         _;
     }    
 
@@ -281,9 +277,9 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev Se utiliza la funcion de OpenZeppelin para el nonReentrant
     function _retirarFondosETH(uint _monto) private nonReentrant verificarRetiroETH(_monto) {
         uint montoUSD = convertirEthEnUSD(_monto);
-        _cuentasMultiToken[address(0)][msg.sender] -= _monto;
-        _retiros++;
-        _totalContrato -= montoUSD;
+        s_cuentasMultiToken[address(0)][msg.sender] -= _monto;
+        s_retiros++;
+        s_totalContrato -= montoUSD;
         
         emit KipuBank_ExtraccionRealizada(msg.sender, montoUSD);
 
@@ -297,9 +293,9 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev Se utiliza la funcion de OpenZeppelin para el nonReentrant
     /// @dev Se utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20
     function _retirarFondosUSDC(uint _monto) private nonReentrant verificarRetiroUSDC(_monto) {
-        _cuentasMultiToken[address(i_usdc)][msg.sender] -= _monto;
-        _retiros++;
-        _totalContrato -= _monto;
+        s_cuentasMultiToken[address(i_usdc)][msg.sender] -= _monto;
+        s_retiros++;
+        s_totalContrato -= _monto;
         emit KipuBank_ExtraccionRealizada(msg.sender, _monto);
         i_usdc.safeTransfer(msg.sender, _monto);
     }
@@ -314,16 +310,23 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param _monto es el monto a retirar de la boveda
     function retirarUSDC(uint _monto) external whenNotPaused {
         _retirarFondosUSDC(_monto);
-    }    
+    } 
+
+    /// @notice Función privada para depositar ETH
+    /// @dev Se hace una función auxiliar para ahorrar llamadas al data feed
+    function _depositoETH(address titular, uint montoUSD, uint montoETH) private verificarDepositoETH(montoUSD) {
+        s_cuentasMultiToken[address(0)][titular] += montoETH;
+        s_depositos++;
+        s_totalContrato += montoUSD;
+        emit KipuBank_DepositoRealizado(titular, montoUSD);
+    }
 
     /// @notice Funcion para depositar en la boveda
-    /// @dev Es payable y usa el modificador de verificarDepositos
-    function depositarETH() external payable verificarDepositoETH(msg.value) whenNotPaused {
-        uint montoUSD = convertirEthEnUSD(msg.value);
-        _cuentasMultiToken[address(0)][msg.sender] += msg.value;
-        _depositos++;
-        _totalContrato += montoUSD;
-        emit KipuBank_DepositoRealizado(msg.sender, montoUSD);
+    /// @dev Debe ser payable
+    function depositarETH() external payable whenNotPaused {
+        uint montoETH = msg.value;
+        uint montoUSD = convertirEthEnUSD(montoETH);
+        _depositoETH(msg.sender, montoUSD, montoETH);
     }
 
     /// @notice Funcion para depositar en la boveda
@@ -332,55 +335,48 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev No se marca como payable ya que es un token ERC20 y no Ether
     /// @dev Necesitamos la aprobación del dueño de los USDC para depositar
     function depositarUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
-        _cuentasMultiToken[address(i_usdc)][msg.sender] += _monto;
-        _depositos++;
-        _totalContrato += _monto;
+        if ( i_usdc.allowance(msg.sender, address(this)) < _monto ) revert KipuBank_MontoNoAutorizado(_monto);
+        s_cuentasMultiToken[address(i_usdc)][msg.sender] += _monto;
+        s_depositos++;
+        s_totalContrato += _monto;
         emit KipuBank_DepositoRealizado(msg.sender, _monto);
         i_usdc.safeTransferFrom(msg.sender, address(this), _monto);
     }
 
-    /// @notice Función para aprobar el depósito de un monto en KipuBank
-    /// @param _monto Es el monto a aprobar
-    function aprobarMontoUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
-        i_usdc.approve(msg.sender, _monto);
-        emit KipuBank_MontoAprobado(msg.sender, _monto);
-    }
-    
-
     /// @notice Funcion para ver el saldo total guardado en el boveda en USD
     /// @return monto_ devuelve el saldo depositado total en USD depositado por cada titular
     function verBoveda() external view returns (uint monto_) {
-        monto_ = convertirEthEnUSD(_cuentasMultiToken[address(0)][msg.sender]) + _cuentasMultiToken[address(i_usdc)][msg.sender];
+        monto_ = convertirEthEnUSD(s_cuentasMultiToken[address(0)][msg.sender]) + s_cuentasMultiToken[address(i_usdc)][msg.sender];
     }
 
     /// @notice Función para ver el saldo en USDC del titular
     /// @return saldo_ Retorna el saldo en USDC
     function verSaldoUSDC() external view returns (uint saldo_) {
-        saldo_ = _cuentasMultiToken[address(i_usdc)][msg.sender];
+        saldo_ = s_cuentasMultiToken[address(i_usdc)][msg.sender];
     }
 
     /// @notice Función para el saldo en ETH del titular
     /// @return saldo_ Retornal el saldo en ETH
     function verSaldoETH() external view returns (uint saldo_) {
-        saldo_ = _cuentasMultiToken[address(0)][msg.sender];
+        saldo_ = s_cuentasMultiToken[address(0)][msg.sender];
     }
 
     /// @notice Funcion para ver la cantidad total de los depositos realizados
     /// @return Devuelve la cantidad de depositos
     function verTotalDepositos() external view returns (uint) {
-        return _depositos;
+        return s_depositos;
     }
 
     /// @notice Funcion para ver la cantidad total de los retiros realizados
     /// @return Devuelve la cantidad de retiros
     function verTotalRetiros() external view returns (uint) {
-        return _retiros;
+        return s_retiros;
     }
 
     /// @notice Funcion para ver el saldo total del contrato en USD
     /// @return Devuelve el saldo del contrato en USD
     function verTotalContrato() external view returns (uint) {
-        return _totalContrato;
+        return s_totalContrato;
     }
 
     /// @notice Función para traspasar el contrato a otro dueño
@@ -454,7 +450,6 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
         emit KipuBank_RolRevocado(cuenta, rol);
     }
 
-
     /// @notice Función para ver el estado del contrato
     function estadoDelContrato() external view 
     returns (
@@ -466,7 +461,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
         ) {
         return (
             paused(),
-            _totalContrato,
+            s_totalContrato,
             i_bankCap,
             i_umbral,
             address(s_feed)
@@ -478,9 +473,8 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param token Es el token que se desea consultar
     /// @return Retorna un entero sin signo, que es el saldo correspondiente
     function balanceOf(address titular, address token) external view returns (uint) {
-        return _cuentasMultiToken[token][titular];
+        return s_cuentasMultiToken[token][titular];
     }
-
 
     /// @notice Override requerido por Solidity para la múltiple herencia
     function supportsInterface(bytes4 interfaceId) 
