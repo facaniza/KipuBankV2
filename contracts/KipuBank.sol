@@ -172,6 +172,8 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param monto Monto excedido
     error KipuBank_MontoNoAutorizado(uint monto);
 
+    /// @notice Error de monto inferior al déposito mínimo
+    /// @param monto Monto inferior al déposito mínimo
     error KipuBank_InferiorDepositoMinimo(uint monto);
 
     /// @notice Constructor del contrato

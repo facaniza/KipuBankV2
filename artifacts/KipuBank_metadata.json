@@ -1087,6 +1087,13 @@
 						}
 					}
 				],
+				"KipuBank_InferiorDepositoMinimo(uint256)": [
+					{
+						"params": {
+							"monto": "Monto inferior al déposito mínimo"
+						}
+					}
+				],
 				"KipuBank_InicializacionInvalida(uint256,uint256)": [
 					{
 						"params": {
@@ -1420,6 +1427,11 @@
 						"notice": "Error por querer ingresar un data feed invalido"
 					}
 				],
+				"KipuBank_InferiorDepositoMinimo(uint256)": [
+					{
+						"notice": "Error de monto inferior al déposito mínimo"
+					}
+				],
 				"KipuBank_InicializacionInvalida(uint256,uint256)": [
 					{
 						"notice": "Error de umbral mayor al limite"
@@ -1714,11 +1726,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xc5d0dc5e5f2de97136a7a958a668d912d1dc4eb026f8d4bdba0a9fa9abe9f603",
+			"keccak256": "0xd9d17abdb989b3e55d802b882e383968a0ab3c292c27a16f9052c707b77b5b2c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b8ba327001579fe911c27cca056fcf090dc726b2b80832605d9bb85851f34ac6",
-				"dweb:/ipfs/QmZfvLMxJ541fGSvWgJN7zY4EwTN2QoZ9ykFAVQMcG44aU"
+				"bzz-raw://e3199457dad8dc931dfe24f9eede7d62c4f9626320d5b17a40476cad1cf72992",
+				"dweb:/ipfs/QmYhWr19xaHARFsubAwkQNwAznr1hjUt5i38JtTZqn3m1H"
 			]
 		}
 	},
