@@ -57,6 +57,9 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev El total del contrato es en USD
     uint private s_totalContrato = 0;
 
+    /// @notice Deposito mínimo de Ether en el contrato
+    uint public constant MIN_DEPOSITO = 1 gwei;
+
     /// @notice Cantidad de depositos del contrato
     uint128 private s_depositos = 0;
 
@@ -169,6 +172,8 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param monto Monto excedido
     error KipuBank_MontoNoAutorizado(uint monto);
 
+    error KipuBank_InferiorDepositoMinimo(uint monto);
+
     /// @notice Constructor del contrato
     /// @param _limite Limite global que se permite por transaccion
     /// @param _umbral Umbral de limite de retiros
@@ -217,9 +222,10 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
     /// @notice Modificador para verificar los depositos
     /// @param _montoUSD es el monto a verificar
-    modifier verificarDepositoETH(uint _montoUSD) {
+    modifier verificarDepositoETH(uint _montoUSD, uint _montoETH) {
+        if(_montoETH < MIN_DEPOSITO) revert KipuBank_InferiorDepositoMinimo(_montoETH);
         if(_montoUSD == 0) revert KipuBank_MontoCero(msg.sender);
-        if (_montoUSD + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_montoUSD);
+        if(_montoUSD + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_montoUSD);
         _;
     }
 
@@ -314,7 +320,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
     /// @notice Función privada para depositar ETH
     /// @dev Se hace una función auxiliar para ahorrar llamadas al data feed
-    function _depositoETH(address titular, uint montoUSD, uint montoETH) private verificarDepositoETH(montoUSD) {
+    function _depositoETH(address titular, uint montoUSD, uint montoETH) private verificarDepositoETH(montoUSD, montoETH) {
         s_cuentasMultiToken[address(0)][titular] += montoETH;
         s_depositos++;
         s_totalContrato += montoUSD;

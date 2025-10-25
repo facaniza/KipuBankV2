@@ -103,6 +103,17 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_InferiorDepositoMinimo",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
 						"name": "limite",
 						"type": "uint256"
 					},
@@ -571,6 +582,19 @@
 						"internalType": "bytes32",
 						"name": "",
 						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MIN_DEPOSITO",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -1488,6 +1512,9 @@
 				"FEED_MANAGER()": {
 					"notice": "Rol de Manager de los data feeds"
 				},
+				"MIN_DEPOSITO()": {
+					"notice": "Deposito mínimo de Ether en el contrato"
+				},
 				"PAUSER()": {
 					"notice": "Rol de pausador del contrato"
 				},
@@ -1687,11 +1714,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0x360083a49667e5b39b0a093d4b711389634dbae45e1f3921dba0f2302a5dca8c",
+			"keccak256": "0xc5d0dc5e5f2de97136a7a958a668d912d1dc4eb026f8d4bdba0a9fa9abe9f603",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4d006911500c09741526d6f8d4b27c1019ddb6825fce3308a843db25acfe4130",
-				"dweb:/ipfs/QmPTEVudAXukGewfCkuM8v3TZqRzNpA6aTHUupTDq3fziS"
+				"bzz-raw://b8ba327001579fe911c27cca056fcf090dc726b2b80832605d9bb85851f34ac6",
+				"dweb:/ipfs/QmZfvLMxJ541fGSvWgJN7zY4EwTN2QoZ9ykFAVQMcG44aU"
 			]
 		}
 	},
