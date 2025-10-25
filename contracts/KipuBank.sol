@@ -109,6 +109,11 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param rol Es el rol que se elimina de la cuenta
     event KipuBank_RolRevocado(address indexed cuenta, bytes32 rol);
 
+    /// @notice Evento para aprobar depósito de monto en USDC
+    /// @param cuenta Es la cuenta que va a autorizar
+    /// @param monto Es el monto autorizado
+    event KipuBank_MontoAprobado(address indexed cuenta, uint monto);
+
     /// @notice Error de extraccion
     /// @param titular titular de la cuenta a realizar la extracción
     /// @param monto monto a extraer de la boveda
@@ -327,13 +332,18 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev No se marca como payable ya que es un token ERC20 y no Ether
     /// @dev Necesitamos la aprobación del dueño de los USDC para depositar
     function depositarUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
-        i_usdc.approve(address(this), _monto);
-        i_usdc.allowance(msg.sender, address(this));
         _cuentasMultiToken[address(i_usdc)][msg.sender] += _monto;
         _depositos++;
         _totalContrato += _monto;
         emit KipuBank_DepositoRealizado(msg.sender, _monto);
         i_usdc.safeTransferFrom(msg.sender, address(this), _monto);
+    }
+
+    /// @notice Función para aprobar el depósito de un monto en KipuBank
+    /// @param _monto Es el monto a aprobar
+    function aprobarMontoUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
+        i_usdc.approve(msg.sender, _monto);
+        emit KipuBank_MontoAprobado(msg.sender, _monto);
     }
     
 

@@ -364,6 +364,25 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "cuenta",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_MontoAprobado",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "ownerViejo",
 						"type": "address"
 					},
@@ -576,6 +595,19 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_monto",
+						"type": "uint256"
+					}
+				],
+				"name": "aprobarMontoUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -1178,6 +1210,12 @@
 						"nuevoFeed": "Es el nuevo data feed a ser utilizado"
 					}
 				},
+				"KipuBank_MontoAprobado(address,uint256)": {
+					"params": {
+						"cuenta": "Es la cuenta que va a autorizar",
+						"monto": "Es el monto autorizado"
+					}
+				},
 				"KipuBank_OwnerTransferido(address,address)": {
 					"params": {
 						"ownerNuevo": "Es el nuevo owner del contrato",
@@ -1214,6 +1252,11 @@
 			},
 			"kind": "dev",
 			"methods": {
+				"aprobarMontoUSDC(uint256)": {
+					"params": {
+						"_monto": "Es el monto a aprobar"
+					}
+				},
 				"balanceOf(address,address)": {
 					"params": {
 						"titular": "Es el titular de la cuenta",
@@ -1450,6 +1493,9 @@
 				"KipuBank_FeedActualizado(address,address)": {
 					"notice": "Evento para la actualización del feed"
 				},
+				"KipuBank_MontoAprobado(address,uint256)": {
+					"notice": "Evento para aprobar depósito de monto en USDC"
+				},
 				"KipuBank_OwnerTransferido(address,address)": {
 					"notice": "Evento para cuando el owner del contrato es transferido"
 				},
@@ -1467,6 +1513,9 @@
 				},
 				"PAUSER()": {
 					"notice": "Rol de pausador del contrato"
+				},
+				"aprobarMontoUSDC(uint256)": {
+					"notice": "Función para aprobar el depósito de un monto en KipuBank"
 				},
 				"balanceOf(address,address)": {
 					"notice": "Función para ver el saldo por token del titular"
@@ -1664,11 +1713,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0x92413ad7063c88bc7329fcce187ccfc66f9204fa7fe4286e045ff82abd440eb2",
+			"keccak256": "0x520337880f99b0448dd17ff733657db97b01cb63db09f24bd8974befec4bc7f5",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2c53925fe916fae45b5c43f452ad25ee5a1dac8c837679648a5ddd7ea1257cf8",
-				"dweb:/ipfs/QmaffyECrC2CiUPFbAdiEySjNZk1926wUonCWrTKbFKHt7"
+				"bzz-raw://602fa9431982b90a871c52a6439408db65219b751735c0c21d89edfcc1f7606d",
+				"dweb:/ipfs/Qmbg48gEHEh9z4HLgqydzCeuEeyxC1Ybp62vUainQyDhty"
 			]
 		}
 	},
