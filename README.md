@@ -1,9 +1,6 @@
 # 🏦 KipuBank V2  
 
-![Solidity](https://img.shields.io/badge/Solidity-0.8.30-blue.svg?logo=ethereum)  
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)  
-![Status](https://img.shields.io/badge/status-deployed-success.svg)  
-![Network](https://img.shields.io/badge/network-Sepolia-purple.svg)  
+![Solidity](https://img.shields.io/badge/Solidity-0.8.30-blue.svg?logo=ethereum)  ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)  ![Status](https://img.shields.io/badge/status-deployed-success.svg)  ![Network](https://img.shields.io/badge/network-Sepolia-purple.svg)  
 
 **KipuBankV2** es un **banco descentralizado en Ethereum** que permite a los usuarios **depositar y retirar fondos tanto en Ether (ETH) como en tokens USDC**, con seguridad reforzada mediante **OpenZeppelin** y validación de límites configurables.  
 
