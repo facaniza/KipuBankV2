@@ -1081,6 +1081,13 @@
 						}
 					}
 				],
+				"KipuBank_NoAutorizado(address)": [
+					{
+						"params": {
+							"sender": "Es la cuenta que quiso acceder a la función"
+						}
+					}
+				],
 				"KipuBank_OperacionNoPermitida(address)": [
 					{
 						"params": {
@@ -1171,6 +1178,24 @@
 						"nuevoFeed": "Es el nuevo data feed a ser utilizado"
 					}
 				},
+				"KipuBank_OwnerTransferido(address,address)": {
+					"params": {
+						"ownerNuevo": "Es el nuevo owner del contrato",
+						"ownerViejo": "Es el anterior owner del contrato"
+					}
+				},
+				"KipuBank_RolDado(address,bytes32)": {
+					"params": {
+						"cuenta": "Es la cuenta que recibe el nuevo rol",
+						"rol": "Es el rol que se le asigna a la cuenta"
+					}
+				},
+				"KipuBank_RolRevocado(address,bytes32)": {
+					"params": {
+						"cuenta": "Es la cuenta a la que se revoca el rol",
+						"rol": "Es el rol que se elimina de la cuenta"
+					}
+				},
 				"Paused(address)": {
 					"details": "Emitted when the pause is triggered by `account`."
 				},
@@ -1207,11 +1232,20 @@
 						"_umbral": "Umbral de limite de retiros"
 					}
 				},
+				"darRol(address,bytes32)": {
+					"params": {
+						"cuenta": "Es la cuenta que recibe el rol",
+						"rol": "Es el rol dado a la cuenta"
+					}
+				},
 				"depositarETH()": {
 					"details": "Es payable y usa el modificador de verificarDepositos"
 				},
 				"depositarUSDC(uint256)": {
 					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no Ether"
+				},
+				"despausarContrato()": {
+					"details": "Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER"
 				},
 				"getRoleAdmin(bytes32)": {
 					"details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
@@ -1224,6 +1258,9 @@
 				},
 				"owner()": {
 					"details": "Returns the address of the current owner."
+				},
+				"pausarContrato()": {
+					"details": "Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER"
 				},
 				"paused()": {
 					"details": "Returns true if the contract is paused, and false otherwise."
@@ -1244,10 +1281,17 @@
 						"_monto": "es el monto a retirar de la boveda"
 					}
 				},
+				"revocarRol(address,bytes32)": {
+					"params": {
+						"cuenta": "Es la cuenta a la que se le revoca el rol",
+						"rol": "Es el rol revocado de la cuenta"
+					}
+				},
 				"revokeRole(bytes32,address)": {
 					"details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleRevoked} event."
 				},
 				"setFeeds(address)": {
+					"details": "Solo pueden acceder a ella el owner o los que tengan el rol FEED_MANAGER",
 					"params": {
 						"_nuevoFeed": "Será la dirección del nuevo data feed del contrato"
 					}
@@ -1354,6 +1398,11 @@
 						"notice": "Error monto cero"
 					}
 				],
+				"KipuBank_NoAutorizado(address)": [
+					{
+						"notice": "Error cuando alguien no autorizado quiere acceder a una función"
+					}
+				],
 				"KipuBank_OperacionNoPermitida(address)": [
 					{
 						"notice": "Error por operacion no permitida"
@@ -1400,15 +1449,33 @@
 				},
 				"KipuBank_FeedActualizado(address,address)": {
 					"notice": "Evento para la actualización del feed"
+				},
+				"KipuBank_OwnerTransferido(address,address)": {
+					"notice": "Evento para cuando el owner del contrato es transferido"
+				},
+				"KipuBank_RolDado(address,bytes32)": {
+					"notice": "Evento para cuando un rol es otorgado"
+				},
+				"KipuBank_RolRevocado(address,bytes32)": {
+					"notice": "Evento para cuando un rol es revocado"
 				}
 			},
 			"kind": "user",
 			"methods": {
+				"FEED_MANAGER()": {
+					"notice": "Rol de Manager de los data feeds"
+				},
+				"PAUSER()": {
+					"notice": "Rol de pausador del contrato"
+				},
 				"balanceOf(address,address)": {
 					"notice": "Función para ver el saldo por token del titular"
 				},
 				"constructor": {
 					"notice": "Constructor del contrato"
+				},
+				"darRol(address,bytes32)": {
+					"notice": "Función para dar un rol a una cuenta"
 				},
 				"depositarETH()": {
 					"notice": "Funcion para depositar en la boveda"
@@ -1430,6 +1497,9 @@
 				},
 				"retirarUSDC(uint256)": {
 					"notice": "Funcion externa para realizar el retiro de saldo en USDC"
+				},
+				"revocarRol(address,bytes32)": {
+					"notice": "Función para revocar el rol a una cuenta"
 				},
 				"s_feed()": {
 					"notice": "Interfaz publica del data feed"
@@ -1594,11 +1664,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xa84997cd83511a6b46b8e3df00d2aac1baac022628be4c38c7e60c2df7305538",
+			"keccak256": "0xe6a6587eefaf51f0ec02bc0b87acd61483cd62ca9eb5f50388cb47dd1906de0c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ced018ca7059a2504c591d7e9bc877022ad6121b07fdb15dc7afb63942c967e9",
-				"dweb:/ipfs/QmTDdP93VV7SZdkgdA1Ux8vXHQpNeRgvWwQj3acTbauFCY"
+				"bzz-raw://8545849778d11bbf3cb30479a647f312b32e65a317ef031fc44f4c17b98d6dc1",
+				"dweb:/ipfs/QmRXNNT2fwtWVo3jo99ZU4zNyQ3pgYRpreMiVou9cck1vb"
 			]
 		}
 	},

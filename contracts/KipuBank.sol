@@ -20,9 +20,10 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 
 contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
-
+    /// @notice Rol de pausador del contrato
     bytes32 public constant PAUSER = keccak256("PAUSER");
 
+    /// @notice Rol de Manager de los data feeds
     bytes32 public constant FEED_MANAGER = keccak256("FEED_MANAGER");
 
     /// @notice Se usa la interfaz SafeERC20 para ampliar una funcionalidad segura en IERC20
@@ -93,10 +94,19 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param tiempo Es el tiempo en el que fue despausado
     event KipuBank_ContratoDespausado(address indexed sender, uint tiempo);
 
+    /// @notice Evento para cuando el owner del contrato es transferido
+    /// @param ownerViejo Es el anterior owner del contrato
+    /// @param ownerNuevo Es el nuevo owner del contrato
     event KipuBank_OwnerTransferido( address indexed ownerViejo, address indexed ownerNuevo);
 
+    /// @notice Evento para cuando un rol es otorgado
+    /// @param cuenta Es la cuenta que recibe el nuevo rol
+    /// @param rol Es el rol que se le asigna a la cuenta
     event KipuBank_RolDado(address indexed cuenta, bytes32 rol);
 
+    /// @notice Evento para cuando un rol es revocado
+    /// @param cuenta Es la cuenta a la que se revoca el rol
+    /// @param rol Es el rol que se elimina de la cuenta
     event KipuBank_RolRevocado(address indexed cuenta, bytes32 rol);
 
     /// @notice Error de extraccion
@@ -153,6 +163,8 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @param nuevoFeed Es el data feed erroneo que quiso ser ingresado
     error KipuBank_FeedInvalido(address nuevoFeed);
 
+    /// @notice Error cuando alguien no autorizado quiere acceder a una función
+    /// @param sender Es la cuenta que quiso acceder a la función
     error KipuBank_NoAutorizado(address sender);
 
     /// @notice Constructor del contrato
@@ -192,8 +204,10 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     /// @dev El contrato no puede enviar data de manera no autorizada
     fallback() external payable { revert KipuBank_OperacionNoPermitida(msg.sender); }
 
-    modifier soloOwnerORol(bytes32 role) {
-        if(owner() != msg.sender || !hasRole(role, msg.sender)) {
+    /// @notice Modificador para que administrar el acceso a la funciones, solo por Rol o por Owner
+    /// @param rol Es el rol que tiene permise a acceder a la función
+    modifier soloOwnerORol(bytes32 rol) {
+        if(owner() != msg.sender || !hasRole(rol, msg.sender)) {
             revert KipuBank_NoAutorizado(msg.sender);
         }
         _;
@@ -379,6 +393,7 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
     /// @notice Función para cambiar el data feeds
     /// @param _nuevoFeed Será la dirección del nuevo data feed del contrato
+    /// @dev Solo pueden acceder a ella el owner o los que tengan el rol FEED_MANAGER
     function setFeeds(address _nuevoFeed) external soloOwnerORol(FEED_MANAGER) whenPaused {
         if (_nuevoFeed == address(0)) revert KipuBank_DireccionInvalida();
 
@@ -398,22 +413,30 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
     }
 
     /// @notice Función para pausar el contrato
+    /// @dev Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER
     function pausarContrato() external soloOwnerORol(PAUSER) whenNotPaused {
         _pause();
         emit KipuBank_ContratoPausado(msg.sender, block.timestamp);
     }
 
     /// @notice Función para despausar el contrato
+    /// @dev Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER
     function despausarContrato() external soloOwnerORol(PAUSER) whenPaused {
         _unpause();
         emit KipuBank_ContratoDespausado(msg.sender, block.timestamp);
     }
 
+    /// @notice Función para dar un rol a una cuenta
+    /// @param cuenta Es la cuenta que recibe el rol
+    /// @param rol Es el rol dado a la cuenta
     function darRol(address cuenta, bytes32 rol) external onlyOwner {
         grantRole(rol, cuenta);
         emit KipuBank_RolDado(cuenta, rol);
     }
 
+    /// @notice Función para revocar el rol a una cuenta
+    /// @param cuenta Es la cuenta a la que se le revoca el rol
+    /// @param rol Es el rol revocado de la cuenta
     function revocarRol(address cuenta, bytes32 rol) external onlyOwner {
         revokeRole(rol, cuenta);
         emit KipuBank_RolRevocado(cuenta, rol);
