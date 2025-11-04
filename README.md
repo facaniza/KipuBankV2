@@ -102,7 +102,7 @@ KipuBankV2 aplica un enfoque de **seguridad multicapa** basado en buenas prácti
 ## 🌐 Contrato verificado  
 
 📍 **Dirección (Sepolia) y vista en el buscador de bloques:**  
-[`0x89C97CEE83627F36e8344AB278B62E7a21C45796`](https://sepolia.etherscan.io/address/0x89C97CEE83627F36e8344AB278B62E7a21C45796)
+[`0x3b9624B12B8F90bC715Aa653c8fcb70bA81E35A8`](https://sepolia.etherscan.io/address/0x3b9624B12B8F90bC715Aa653c8fcb70bA81E35A8)
 
 ---
 
