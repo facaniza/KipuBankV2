@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.30;
 
-    /// @title KipuBank - Un banco en blockchain
+    /// @title KipuBank - A blockchain Bank
     /// @author Facundo Alejandro Caniza
 
-/// @notice Importaciones de OpenZeppelin
-/// @dev Se debe importar las librerias/contratos ReentrancyGuard, IERC20, SafeIERC, Ownable, Pausable y AccesControl
+/// @notice OpenZeppeling imports
+/// @dev Must be imported ReentrancyGuard, IERC20, SafeIERC, Ownable, Pausable and AccesControl
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -14,186 +14,191 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-/// @notice Importación de interfaz de Chainlink
-/// @dev Usamos la importación de Data Feeds
+/// @notice ChainLink Interface import
+/// @dev We use data feeds interface
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
-    /// @notice Rol de pausador del contrato
+    /// @notice Pauser contract rol
     bytes32 public constant PAUSER = keccak256("PAUSER");
 
-    /// @notice Rol de Manager de los data feeds
+    /// @notice Data feeds manager rol
     bytes32 public constant FEED_MANAGER = keccak256("FEED_MANAGER");
 
-    /// @notice Interfaz publica del data feed
-    /// @dev Utilizamos el data feed de Chainlink
+    /// @notice Public interface data feeds
+    /// @dev We use data feeds of ChainkLink
     AggregatorV3Interface public s_feed;
 
-    /// @notice Direccion del Token ERC20
-    /// @dev Es especifico para el token USDC
+    /// @notice ERC20 Token address
+    /// @dev USDC specific token
     IERC20 immutable i_usdc;    
 
-    /// @notice Se usa la interfaz SafeERC20 para ampliar una funcionalidad segura en IERC20
-    /// @dev Se amplia funcionalidad segura al IERC20
+    /// @notice SafeERC20 interface it is used to expand safe funcionality for IERC20
+    /// @dev Expand safe funcionality for IERC20
     using SafeERC20 for IERC20;
 
-    /// @notice Constante de refresco del precio del data feed
-    /// @dev Por convención se establece en 3600
+    /// @notice Data feed constant refresh for data feed
+    /// @dev By convention we use 3600
     uint16 constant HEARTBEAT = 3600;
 
-    /// @notice Constante de decimales de conversión
-    /// @dev Se hace la suma de los decimales de ethereum y de los decimales de la conversión de chainlink para restarles los decimales de USDC, nos da la base igualitaria
+    /// @notice Conversion decimals constant
+    /// @dev We do the sum of ethereum decimals y chainlink decimals, then we substraction of the USDC decimals, it gave us the basis for equalization
     uint constant DECIMAL_FACTOR = 1 * 10 ** 20;
 
-    /// @notice Umbral para fijo para transaccion
-    uint immutable i_umbral;
+    /// @notice Fixed Transaction threshold 
+    uint immutable i_threshold;
 
-    /// @notice Limite global de deposito
-    /// @dev Tener en cuenta que el limite global será en USD
+    /// @notice Global deposit limite
+    /// @dev Keep in mind, global limit will be in USD
     uint immutable i_bankCap;
 
-    /// @notice Total de ether depositado en el contrato
-    /// @dev El total del contrato es en USD
-    uint private s_totalContrato = 0;
+    ///@notice Total Ether deposited
+    /// @dev Total of the contract it is counted in USD
+    uint private s_totalContract = 0;
 
-    /// @notice Deposito mínimo de Ether en el contrato
-    uint public constant MIN_DEPOSITO = 1 gwei;
+    /// @notice Minimum deposit of Ether to the contract
+    /// @dev Will use 1 Gwei as minimun
+    uint public constant MIN_DEPOSIT = 1 gwei;
 
-    /// @notice Cantidad de depositos del contrato
-    uint128 private s_depositos = 0;
+    /// @notice Deposits contract counter
+    /// @notice Deposits count toward the contract
+    uint128 private s_deposits = 0;
 
-    /// @notice Cantidad de retiros del contrato
-    uint128 private s_retiros = 0;    
+    /// @notice Withdrawal contract counter
+    /// @notice Withdrawal count for the contract
+    uint128 private s_withdrawal = 0;    
 
-    /// @notice Estructura que almacena por titular el monto que posee en los diferentes tokens
-    /// @dev En el primer mapping tenemos la direcciones del token, en el segundo mapping tenemos las direcciones de los titulares
-    mapping (address token => mapping (address titular => uint monto)) private s_cuentasMultiToken;
+    /// @notice Storage struct that stores a token amount, in different tokens, for each address
+    /// @dev In the first mapping we have token address, in the nested mapping we have the holder and their balance
+    mapping (address token => mapping (address holder => uint amount)) private s_balances;
 
-    /// @notice Evento para depositos realizado exitosamente
-    /// @param titular titular que realiza el detposito
-    /// @param monto monto que se desea depositar
-    event KipuBank_DepositoRealizado(address indexed titular, uint monto);
+    /// @notice Successful deposit made event
+    /// @param holder Holder who made the deposit
+    /// @param amount The Deposited amount
+    event KipuBank_SuccessfulDeposit(address indexed holder, uint amount);
 
-    /// @notice Evento para extracciones realizadas exitosamente
-    /// @param titular titular que desea realizar la extracción
-    /// @param monto monto que se desea extraer
-    event KipuBank_ExtraccionRealizada(address indexed titular, uint monto);
+    /// @notice Successful withdrawal made
+    /// @param holder The holder who perfomed the withdrawal
+    /// @param amount The amount withdrawn
+    event KipuBank_SuccessfulWithdrawal(address indexed holder, uint amount);
 
-    /// @notice Evento para la actualización del feed
-    /// @param antiguoFeed Es el antiguo data feed utilizado
-    /// @param nuevoFeed Es el nuevo data feed a ser utilizado
-    event KipuBank_FeedActualizado(address indexed antiguoFeed, address indexed nuevoFeed);
+    /// @notice Feed update event
+    /// @param previousFeed Was the previous feed address
+    /// @param newFeed The new feed address
+    event KipuBank_FeedUpdated(address indexed previousFeed, address indexed newFeed);
 
-    /// @notice Evento para pausar el contrato
-    /// @param sender Es la dirección que pauso el contrato
-    /// @param tiempo Es el tiempo en el que fue pausado el contrato
-    event KipuBank_ContratoPausado(address indexed sender, uint tiempo);
+    /// @notice Contract pause event
+    /// @param pauser The address that paused the contract
+    /// @param time The timestamp when was paused
+    event KipuBank_ContractPaused(address indexed pauser, uint time);
 
-    /// @notice Evento para despausar el contrato
-    /// @param sender Es la direccion que despausó el contrato
-    /// @param tiempo Es el tiempo en el que fue despausado
-    event KipuBank_ContratoDespausado(address indexed sender, uint tiempo);
+    /// @notice Contract unpaused event
+    /// @param unpauser The address that unpaused the contract
+    /// @param time The timestamp when was unpaused
+    event KipuBank_ContractUnpaused(address indexed unpauser, uint time);
 
-    /// @notice Evento para cuando el owner del contrato es transferido
-    /// @param ownerViejo Es el anterior owner del contrato
-    /// @param ownerNuevo Es el nuevo owner del contrato
-    event KipuBank_OwnerTransferido( address indexed ownerViejo, address indexed ownerNuevo);
+    /// @notice Ownership transfer event
+    /// @param previousOwner The previous owner of the contract
+    /// @param newOwner The new owner of the contract
+    event KipuBank_TransferredOwner( address indexed previousOwner, address indexed newOwner);
 
-    /// @notice Evento para cuando un rol es otorgado
-    /// @param cuenta Es la cuenta que recibe el nuevo rol
-    /// @param rol Es el rol que se le asigna a la cuenta
-    event KipuBank_RolDado(address indexed cuenta, bytes32 rol);
+    /// @notice Rol granted event
+    /// @param account The account that was granted the new role
+    /// @param role The role was granted
+    event KipuBank_GrantedRole(address indexed account, bytes32 role);
 
-    /// @notice Evento para cuando un rol es revocado
-    /// @param cuenta Es la cuenta a la que se revoca el rol
-    /// @param rol Es el rol que se elimina de la cuenta
-    event KipuBank_RolRevocado(address indexed cuenta, bytes32 rol);
+    /// @notice Role revoked event
+    /// @param account The account that was revoked the role
+    /// @param role The role that revoked
+    event KipuBank_RoleRevoked(address indexed account, bytes32 role);
 
-    /// @notice Error de extraccion
-    /// @param titular titular de la cuenta a realizar la extracción
-    /// @param monto monto a extraer de la boveda
-    error KipuBank_ExtraccionRechazada(address titular, uint monto);
+    /// @notice Withdrawal rejected error 
+    /// @param holder The holder that perfomed the withdrawal
+    /// @param amount The amount to withdraw
+    error KipuBank_RejectedWithdraw(address holder, uint amount);
 
-    /// @notice Error por sobrepasarse del limite
-    /// @param monto monto que excede el limite a depositar
-    error KipuBank_LimiteExcedido(uint monto);
+    /// @notice Exceeding limit error
+    /// @param amount The amount that exceeded the limite
+    error KipuBank_ExceededLimit(uint amount);
 
-    /// @notice Error por saldo insuficiente
-    /// @param titular titular con saldo insuficiente
-    /// @param monto monto a retirar
-    error KipuBank_SaldoInsuficiente(address titular, uint monto);
+    /// @notice Insufficient funds error
+    /// @param holder The holder with insufficient funds
+    /// @param amount The amount to withdraw
+    error KipuBank_InsufficientsFunds(address holder, uint amount);
 
-    /// @notice Error por umbral excedido
-    /// @param monto que excede el umbral establecido
-    error KipuBank_UmbralExcedido(uint monto);
+    /// @notice Threshold exceeded error
+    /// @param amount The amount that exceeds the threshold
+    error KipuBank_ExceededThreshold(uint amount);
 
-    /// @notice Error monto cero
-    /// @param titular titular que emite una transaccion con valor nulo
-    error KipuBank_MontoCero(address titular);
+    /// @notice Zero amount error
+    /// @param holder The holder who attempted a transaction with zero value
+    error KipuBank_ZeroAmount(address holder);
 
-    /// @notice Error por umbral invalido
-    /// @param umbral umbral que es invalido
-    error KipuBank_UmbralInvalido(uint umbral);
+    /// @notice Invalid threshold error
+    /// @param threshold The invalid threshold
+    error KipuBank_InvalidThreshold(uint threshold);
 
-    /// @notice Error por limite invalido
-    /// @param limite limite que es invalido
-    error KipuBank_LimiteInvalido(uint limite);
+    /// @notice Invalid limit error
+    /// @param limit The limit that is invalid
+    error KipuBank_InvalidLimit(uint limit);
 
-    /// @notice Error de umbral mayor al limite
-    /// @param umbral umbral del contrato
-    /// @param limite limite del contrato
-    error KipuBank_InicializacionInvalida(uint limite, uint umbral);
+    /// @notice Limit above threshold error
+    /// @param threshold The attempted threshold of the contract
+    /// @param limit The limit of the contract
+    error KipuBank_InvalidInit(uint limit, uint threshold);
 
-    /// @notice Error por operacion no permitida
-    /// @param titular titular que realizo la operacion no permitida
-    error KipuBank_OperacionNoPermitida(address titular);
+    /// @notice Operation not permitted error
+    /// @param holder The holder who attempted a non-permitted operation
+    error KipuBank_NonPermittedOperation(address holder);
 
-    /// @notice Error por óraculo dando un precio equivoco
-    /// @param precio Precio que dió el óraculo
-    error KipuBank_OraculoComprometido(uint precio);
+    /// @notice Oracle price error
+    /// @param price The incorrect price
+    error KipuBank_CommittedOracle(uint price);
 
-    /// @notice Error por precio desactualizado
-    /// @param precio Es el precio que quedó desactualizado
-    error KipuBank_PrecioDesactualizado(uint precio);
+    /// @notice Outdated price error
+    /// @param price The outdate price
+    error KipuBank_OutdatedPrice(uint price);
 
-    /// @notice Error por querer hacer un "set" de una dirección invalida
-    error KipuBank_DireccionInvalida();
+    /// @notice Invalid address set error
+    error KipuBank_InvalidAddress();
 
-    /// @notice Error por querer ingresar un data feed invalido
-    /// @param nuevoFeed Es el data feed erroneo que quiso ser ingresado
-    error KipuBank_FeedInvalido(address nuevoFeed);
+    /// @notice Invalid data feed address error
+    /// @param newFeed The new data feed provider
+    error KipuBank_InvalidFeed(address newFeed);
 
-    /// @notice Error cuando alguien no autorizado quiere acceder a una función
-    /// @param sender Es la cuenta que quiso acceder a la función
-    error KipuBank_NoAutorizado(address sender);
+    /// @notice Non-permitted function access error
+    /// @param account The account that attempted to access a non-permitted function
+    error KipuBank_NonPermittedAccess(address account);
 
-    /// @notice Error de monto no autorizado a depositar
-    /// @param monto Monto excedido
-    error KipuBank_MontoNoAutorizado(uint monto);
+    /// @notice Non-permitted deposit amount
+    /// @param amount The exceeded amount
+    error KipuBank_NonPermittedAmount(uint amount);
 
-    /// @notice Error de monto inferior al déposito mínimo
-    /// @param monto Monto inferior al déposito mínimo
-    error KipuBank_InferiorDepositoMinimo(uint monto);
+    /// @notice Amount lower than minimum deposit
+    /// @param amount The amount that is below the minimum
+    error KipuBank_LowerMinimumAmount(uint amount);
 
-    /// @notice Constructor del contrato
-    /// @param _limite Limite global que se permite por transaccion
-    /// @param _umbral Umbral de limite de retiros
-    /// @param _feed Direccion del data feed a utlizar
-    /// @param _tokenERC20 Direccion del token ERC20 a utilizar
-    /// @dev Se deben generar el limite, umbral y las direcciones del data feed y el token a utilizar al momento de desplegar el contrato
+    /// @notice Contract constructor
+    /// @param _limit The global limit for the contract
+    /// @param _threshold The global threshold for the contract
+    /// @param _feed The feed address to use
+    /// @param _tokenERC20 The address of the ERC20 token to use
+    /// @dev They must be generated at the time of deployment
     constructor(
-        uint _limite, 
-        uint _umbral, 
-        address _owner, 
-        address _feed, 
-        address _tokenERC20) 
-        Ownable(_owner) {
-        if(_limite == 0) revert KipuBank_LimiteInvalido(_limite);
-        if(_umbral == 0) revert KipuBank_UmbralInvalido(_umbral);
-        if(_umbral > _limite) revert KipuBank_InicializacionInvalida(_limite, _umbral);
-        if(_feed == address(0)) revert KipuBank_DireccionInvalida();
-        if(_tokenERC20 == address(0)) revert KipuBank_DireccionInvalida();
+        uint _limit,
+        uint _threshold,
+        address _owner,
+        address _feed,
+        address _tokenERC20
+        )
+        Ownable(_owner) 
+    {
+        if(_limit == 0) revert KipuBank_InvalidLimit(_limit);
+        if(_threshold == 0) revert KipuBank_InvalidThreshold(_threshold);
+        if(_threshold > _limit) revert KipuBank_InvalidInit(_limit, _threshold);
+        if(_feed == address(0)) revert KipuBank_InvalidAddress();
+        if(_tokenERC20 == address(0)) revert KipuBank_InvalidAddress();
         
         _grantRole(DEFAULT_ADMIN_ROLE, _owner);
         _grantRole(PAUSER, _owner);
@@ -201,290 +206,301 @@ contract KipuBank is ReentrancyGuard, Ownable, Pausable, AccessControl {
 
         i_usdc = IERC20(_tokenERC20);
         s_feed = AggregatorV3Interface(_feed);
-        i_bankCap = _limite;
-        i_umbral = _umbral;
+        i_bankCap = _limit;
+        i_threshold = _threshold;
     }
 
-    /// @notice Funcion receive() no permitida
-    /// @dev El contrato no puede recibir ether sin data
-    receive() external payable { revert KipuBank_OperacionNoPermitida(msg.sender); }
+    /// @notice The function receive() is not permitted
+    /// @dev The contract should not receive Ether
+    receive() external payable { revert KipuBank_NonPermittedOperation(msg.sender); }
 
-    /// @notice Funcion fallback() no permitida
-    /// @dev El contrato no puede enviar data de manera no autorizada
-    fallback() external payable { revert KipuBank_OperacionNoPermitida(msg.sender); }
+    /// @notice The function fallback() is not permitted
+    /// @dev The contract should not send data with no autorization
+    fallback() external payable { revert KipuBank_NonPermittedOperation(msg.sender); }
 
-    /// @notice Modificador para que administrar el acceso a la funciones, solo por Rol o por Owner
-    /// @param rol Es el rol que tiene permise a acceder a la función
-    modifier soloOwnerORol(bytes32 rol) {
-        if(owner() != msg.sender && !hasRole(rol, msg.sender)) {
-            revert KipuBank_NoAutorizado(msg.sender);
+    /// @notice Modifier to manage function accesss, only role or owner
+    /// @param role The role that have permissions
+    modifier onlyOwnerORole(bytes32 role) {
+        if(owner() != msg.sender && !hasRole(role, msg.sender)) {
+            revert KipuBank_NonPermittedAccess(msg.sender);
         }
         _;
     }    
 
-    /// @notice Modificador para verificar los depositos
-    /// @param _montoUSD es el monto a verificar
-    modifier verificarDepositoETH(uint _montoUSD, uint _montoETH) {
-        if(_montoETH < MIN_DEPOSITO) revert KipuBank_InferiorDepositoMinimo(_montoETH);
-        if(_montoUSD == 0) revert KipuBank_MontoCero(msg.sender);
-        if(_montoUSD + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_montoUSD);
+    /// @notice Modifier to verify deposits
+    /// @param _amountUSD The amount to verify
+    modifier verifyEthDeposit(uint _amountUSD, uint _amountETH) {
+        if(_amountETH < MIN_DEPOSIT) revert KipuBank_LowerMinimumAmount(_amountETH);
+        if(_amountUSD == 0) revert KipuBank_ZeroAmount(msg.sender);
+        if(_amountUSD + s_totalContract > i_bankCap) revert KipuBank_ExceededLimit(_amountUSD);
         _;
     }
 
-    /// @notice Modificador para verificar los depositos
-    /// @param _monto es el monto a verificar
-    modifier verificarDepositoUSDC(uint _monto) {
-        if(_monto == 0) revert KipuBank_MontoCero(msg.sender);
-        if (_monto + s_totalContrato > i_bankCap) revert KipuBank_LimiteExcedido(_monto);
+    /// @notice Modifier to verify deposit in USDC
+    /// @param _amount Is the amount to verify
+    modifier verifyUsdcAmount(uint _amount) {
+        if(_amount == 0) revert KipuBank_ZeroAmount(msg.sender);
+        if (_amount + s_totalContract > i_bankCap) revert KipuBank_ExceededLimit(_amount);
         _;
     }    
 
-    /// @notice Modificador para verificar los retiros
-    /// @param _monto monto a verificar para el retiro
-    /// @dev El umbral solo se aplica a los retiros de boveda
-    modifier verificarRetiroETH(uint _monto) {
-        uint montoUSDC = convertirEthEnUSD(_monto);
-        if(montoUSDC == 0) revert KipuBank_MontoCero(msg.sender);
-        if (montoUSDC > i_umbral) revert KipuBank_UmbralExcedido(montoUSDC);
-        if (_monto > s_cuentasMultiToken[address(0)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, montoUSDC);
+    /// @notice Modifier to verify withdrawal
+    /// @param _amount The amount to verify to withdrawal
+    /// @dev The threshold only applies to wihtdrawals
+    modifier verifyEthWithdraw(uint _amount) {
+        uint amountUSD = convertEthInUSD(_amount);
+        if(amountUSD == 0) revert KipuBank_ZeroAmount(msg.sender);
+        if (amountUSD > i_threshold) revert KipuBank_ExceededThreshold(amountUSD);
+        if (_amount > s_balances[address(0)][msg.sender]) revert KipuBank_InsufficientsFunds(msg.sender, amountUSD);
         _;
     }
 
-    /// @notice Modificador para verificar los retiros
-    /// @param _monto monto a verificar para el retiro
-    /// @dev El umbral solo se aplica a los retiros de boveda
-    modifier verificarRetiroUSDC(uint _monto) {
-        if(_monto == 0) revert KipuBank_MontoCero(msg.sender);
-        if (_monto > i_umbral) revert KipuBank_UmbralExcedido(_monto);
-        if (_monto > s_cuentasMultiToken[address(i_usdc)][msg.sender]) revert KipuBank_SaldoInsuficiente(msg.sender, _monto);
+    /// @notice Modifier to verify withdraws
+    /// @param _amount The amount to verify
+    /// @dev The threshold only it's applies to withdraws
+    modifier verifyWithdrawUSDC(uint _amount) {
+        if(_amount == 0) revert KipuBank_ZeroAmount(msg.sender);
+        if (_amount > i_threshold) revert KipuBank_ExceededThreshold(_amount);
+        if (_amount > s_balances[address(i_usdc)][msg.sender]) revert KipuBank_InsufficientsFunds(msg.sender, _amount);
         _;
     }    
 
-    /// @notice Función para realizar la consulta del precio mediante óraculo
-    /// @return precioUSD_ Retorna el precio en USD
-    /// @dev Usamos el óraculo de ChainLink
-    function chainLinkFeeds() internal view returns(uint precioUSD_) {
+    /// @notice The function to perform the price query using the oracle
+    /// @return priceUSD_ It is return the USD Price
+    /// @dev We use the ChainLink Oracle
+    function chainLinkFeeds() internal view returns(uint priceUSD_) {
         (, int256 ethUSDPrice,, uint256 updateAt,) = s_feed.latestRoundData();
-        if( ethUSDPrice <= 0) revert KipuBank_OraculoComprometido(uint(ethUSDPrice));
-        if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_PrecioDesactualizado(uint(ethUSDPrice));
+        if( ethUSDPrice <= 0) revert KipuBank_CommittedOracle(uint(ethUSDPrice));
+        if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_OutdatedPrice(uint(ethUSDPrice));
 
-        precioUSD_ = uint(ethUSDPrice);
+        priceUSD_ = uint(ethUSDPrice);
     }
 
-    /// @notice Funcion para convertir ETH en USDC
-    /// @param _monto Es el monto ingresado a convertir
-    /// @return montoConvertido_ Es el monto una vez convertido a USD
-    /// @dev La cuenta debe hacerse debido a que los decimales de USDC y ETH no son los mismos, por lo tanto, se nivelan las bases
-    function convertirEthEnUSD(uint _monto) internal view returns (uint montoConvertido_) {
-            montoConvertido_ = (_monto * chainLinkFeeds()) / DECIMAL_FACTOR;
-    }    
+    /// @notice The function to convert ETH to USDC
+    /// @param _amount The entered amount to convert
+    /// @return convertedAmount_ The amount converted
+    /// @dev The operation perfomed is level the bases
+    function convertEthInUSD(uint _amount) internal view returns (uint convertedAmount_) {
+            convertedAmount_ = (_amount* chainLinkFeeds()) / DECIMAL_FACTOR;
+    }
 
-    /// @notice Funcion privada para realizar el retiro efectivo de fondos en ETH
-    /// @param _monto recibe el monto a retirar de la boveda
-    /// @dev Se actualiza el estado antes de la transferencia para aplicar el patrón CEI
-    /// @dev Se utiliza la funcion de OpenZeppelin para el nonReentrant
-    function _retirarFondosETH(uint _monto) private nonReentrant verificarRetiroETH(_monto) {
-        uint montoUSD = convertirEthEnUSD(_monto);
-        s_cuentasMultiToken[address(0)][msg.sender] -= _monto;
-        s_retiros++;
-        s_totalContrato -= montoUSD;
+    /// @notice Private function to perform the ETH withdraw
+    /// @param _amount The amount to withdraw
+    /// @dev Is updated the state before the transfer, CEI pattern
+    /// @dev It is used the NonReentrant OpenZeppelin function
+    function _withdrawETH(uint _amount) private nonReentrant verifyEthWithdraw(_amount) {
+        uint amountUSD = convertEthInUSD(_amount);
+        s_balances[address(0)][msg.sender] -= _amount;
+        s_withdrawal++;
+        s_totalContract -= amountUSD;
         
-        emit KipuBank_ExtraccionRealizada(msg.sender, montoUSD);
+        emit KipuBank_SuccessfulWithdrawal(msg.sender, amountUSD);
 
-        (bool success, ) = payable(msg.sender).call{value: _monto}("");
-        if (!success) revert KipuBank_ExtraccionRechazada(msg.sender, _monto);
+        (bool success, ) = payable(msg.sender).call{value: _amount}("");
+        if (!success) revert KipuBank_RejectedWithdraw(msg.sender, _amount);
     }
 
-    /// @notice Funcion privada para realizar el retiro efectivo de fondos en USDC
-    /// @param _monto recibe el monto a retirar de la boveda
-    /// @dev Se actualiza el estado antes de la transferencia para aplicar el patrón CEI
-    /// @dev Se utiliza la funcion de OpenZeppelin para el nonReentrant
-    /// @dev Se utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20
-    function _retirarFondosUSDC(uint _monto) private nonReentrant verificarRetiroUSDC(_monto) {
-        s_cuentasMultiToken[address(i_usdc)][msg.sender] -= _monto;
-        s_retiros++;
-        s_totalContrato -= _monto;
-        emit KipuBank_ExtraccionRealizada(msg.sender, _monto);
-        i_usdc.safeTransfer(msg.sender, _monto);
+    /// @notice Private function to perform the USDC withdraw
+    /// @param _amount The amount to withdraw
+    /// @dev It is used the NonReentrant OpenZeppelin function
+    /// @dev Is updated the state before the transfer, CEI pattern
+    /// @dev It is used the SafeIERC20 interface of OpenZeppelin
+    function _withdrawUSDC(uint _amount) private nonReentrant verifyWithdrawUSDC(_amount) {
+        s_balances[address(i_usdc)][msg.sender] -= _amount;
+        s_withdrawal++;
+        s_totalContract -= _amount;
+        emit KipuBank_SuccessfulWithdrawal(msg.sender, _amount);
+        i_usdc.safeTransfer(msg.sender, _amount);
     }
 
-    /// @notice Funcion externa para realizar el retiro de saldo en ETH
-    /// @param _monto es el monto a retirar de la boveda
-    function retirarETH(uint _monto) external whenNotPaused {
-        _retirarFondosETH(_monto);
+    /// @notice External functoin to perform withdraw in ETH
+    /// @param _amount The amount to withdraw
+    function withdrawETH(uint _amount) external whenNotPaused {
+        _withdrawETH(_amount);
     }
-
-    /// @notice Funcion externa para realizar el retiro de saldo en USDC
-    /// @param _monto es el monto a retirar de la boveda
-    function retirarUSDC(uint _monto) external whenNotPaused {
-        _retirarFondosUSDC(_monto);
+    
+    /// @notice External function to withdraw USDC
+    /// @param _amount The amount to withdraw
+    function withdrawUSDC(uint _amount) external whenNotPaused {
+        _withdrawUSDC(_amount);
     } 
 
-    /// @notice Función privada para depositar ETH
-    /// @dev Se hace una función auxiliar para ahorrar llamadas al data feed
-    function _depositoETH(address titular, uint montoUSD, uint montoETH) private verificarDepositoETH(montoUSD, montoETH) {
-        s_cuentasMultiToken[address(0)][titular] += montoETH;
-        s_depositos++;
-        s_totalContrato += montoUSD;
-        emit KipuBank_DepositoRealizado(titular, montoUSD);
+    /// @notice Private function to deposit ETH
+    /// @param _holder The holder that perfomed the deposit
+    /// @param _amountUSD The amount in USD to verify
+    /// @param _amountETH The amount in ETH to deposit
+    /// @dev A private function is implemented to save gas, calling the data feed
+    function _depositETH(address _holder, uint _amountUSD, uint _amountETH) private verifyEthDeposit(_amountUSD, _amountETH) {
+        s_balances[address(0)][_holder] += _amountETH;
+        s_deposits++;
+        s_totalContract += _amountUSD;
+        emit KipuBank_SuccessfulDeposit(_holder, _amountUSD);
     }
 
-    /// @notice Funcion para depositar en la boveda
-    /// @dev Debe ser payable
-    function depositarETH() external payable whenNotPaused {
-        uint montoETH = msg.value;
-        uint montoUSD = convertirEthEnUSD(montoETH);
-        _depositoETH(msg.sender, montoUSD, montoETH);
+    /// @notice Function to deposit ETH
+    /// @dev Must be payable
+    function depositETH() external payable whenNotPaused {
+        uint amountETH = msg.value;
+        uint amountUSD = convertEthInUSD(amountETH);
+        _depositETH(msg.sender, amountUSD, amountETH);
     }
 
-    /// @notice Funcion para depositar en la boveda
-    /// @dev Es payable y usa el modificador de verificarDepositos
-    /// @dev Se utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20
-    /// @dev No se marca como payable ya que es un token ERC20 y no Ether
-    /// @dev Necesitamos la aprobación del dueño de los USDC para depositar
-    function depositarUSDC(uint _monto) external verificarDepositoUSDC(_monto) whenNotPaused {
-        if ( i_usdc.allowance(msg.sender, address(this)) < _monto ) revert KipuBank_MontoNoAutorizado(_monto);
-        s_cuentasMultiToken[address(i_usdc)][msg.sender] += _monto;
-        s_depositos++;
-        s_totalContrato += _monto;
-        emit KipuBank_DepositoRealizado(msg.sender, _monto);
-        i_usdc.safeTransferFrom(msg.sender, address(this), _monto);
+    /// @notice Function to deposit USDC
+    /// @dev It is payable and use the verifyUsdcAmount modifier
+    /// @dev It is used the SafeIERC20 interface to perform
+    /// @dev We need the aprobation of the owner tokens
+    function depositarUSDC(uint _amount) external verifyUsdcAmount(_amount) whenNotPaused {
+        if ( i_usdc.allowance(msg.sender, address(this)) < _amount ) revert KipuBank_NonPermittedAmount(_amount);
+        s_balances[address(i_usdc)][msg.sender] += _amount;
+        s_deposits++;
+        s_totalContract += _amount;
+        emit KipuBank_SuccessfulDeposit(msg.sender, _amount);
+        i_usdc.safeTransferFrom(msg.sender, address(this), _amount);
     }
 
-    /// @notice Funcion para ver el saldo total guardado en el boveda en USD
-    /// @return monto_ devuelve el saldo depositado total en USD depositado por cada titular
-    function verBoveda() external view returns (uint monto_) {
-        monto_ = convertirEthEnUSD(s_cuentasMultiToken[address(0)][msg.sender]) + s_cuentasMultiToken[address(i_usdc)][msg.sender];
+    /// @notice Function to view the balance in USD
+    /// @return amount_ The amount of the total balance in USD
+    function viewAccountTotalBalance() external view returns (uint amount_) {
+        amount_ = convertEthInUSD(s_balances[address(0)][msg.sender]) + s_balances[address(i_usdc)][msg.sender];
     }
 
-    /// @notice Función para ver el saldo en USDC del titular
-    /// @return saldo_ Retorna el saldo en USDC
-    function verSaldoUSDC() external view returns (uint saldo_) {
-        saldo_ = s_cuentasMultiToken[address(i_usdc)][msg.sender];
+    /* 
+        # It is unnecessary when having a balanceOf function
+
+    /// @notice Function to view the USDC balance
+    /// @return amount_ The amount in USDC
+    function viewUsdcBalance() external view returns (uint amount_) {
+        amount_ = s_balances[address(i_usdc)][msg.sender];
     }
 
-    /// @notice Función para el saldo en ETH del titular
-    /// @return saldo_ Retornal el saldo en ETH
-    function verSaldoETH() external view returns (uint saldo_) {
-        saldo_ = s_cuentasMultiToken[address(0)][msg.sender];
+    /// @notice Function to view the ETH balance
+    /// @return amount_ The amount in ETH 
+    function viewEthBalance() external view returns (uint amount_) {
+        amount_ = s_balances[address(0)][msg.sender];
+    }
+    */
+
+    /// @notice Function to view the deposits count
+    function viewDepositsCount() external view returns (uint) {
+        return s_deposits;
     }
 
-    /// @notice Funcion para ver la cantidad total de los depositos realizados
-    /// @return Devuelve la cantidad de depositos
-    function verTotalDepositos() external view returns (uint) {
-        return s_depositos;
+    /// @notice Function to view the withdraws count
+    function viewWithdrawCount() external view returns (uint) {
+        return s_withdrawal;
     }
 
-    /// @notice Funcion para ver la cantidad total de los retiros realizados
-    /// @return Devuelve la cantidad de retiros
-    function verTotalRetiros() external view returns (uint) {
-        return s_retiros;
+    /// @notice Function to view the contract balance in USD
+    function viewContractBalance() external view returns (uint) {
+        return s_totalContract;
     }
 
-    /// @notice Funcion para ver el saldo total del contrato en USD
-    /// @return Devuelve el saldo del contrato en USD
-    function verTotalContrato() external view returns (uint) {
-        return s_totalContrato;
-    }
-
-    /// @notice Función para traspasar el contrato a otro dueño
-    /// @param _nuevoOwner Será la dirección del nuevo propietario del contrato
-    /// @dev El modificador de onlyOwner es necesario para seguridad
-    function transferirOwner(address _nuevoOwner) external onlyOwner whenPaused {
+    /// @notice Function to transfer the ownership another address
+    /// @param _newOwner The address of the new owner of the contract
+    /// @dev It is used the onlyOwner modifier
+    function transferTheOwnership(address _newOwner) external onlyOwner whenPaused {
         
-        address ownerActual = owner();
+        address previousOwner = owner();
 
-        _revokeRole(DEFAULT_ADMIN_ROLE, ownerActual);
-        _revokeRole(PAUSER, ownerActual);
-        _revokeRole(FEED_MANAGER, ownerActual);
+        _revokeRole(DEFAULT_ADMIN_ROLE, previousOwner);
+        _revokeRole(PAUSER, previousOwner);
+        _revokeRole(FEED_MANAGER, previousOwner);
 
-        _transferOwnership(_nuevoOwner);
+        _transferOwnership(_newOwner);
 
-        _grantRole(DEFAULT_ADMIN_ROLE, _nuevoOwner);
-        _grantRole(FEED_MANAGER, _nuevoOwner);
-        _grantRole(PAUSER, _nuevoOwner);
+        _grantRole(DEFAULT_ADMIN_ROLE, _newOwner);
+        _grantRole(FEED_MANAGER, _newOwner);
+        _grantRole(PAUSER, _newOwner);
 
-        emit KipuBank_OwnerTransferido(ownerActual, _nuevoOwner);
+        emit KipuBank_TransferredOwner(previousOwner, _newOwner);
     }
 
-    /// @notice Función para cambiar el data feeds
-    /// @param _nuevoFeed Será la dirección del nuevo data feed del contrato
-    /// @dev Solo pueden acceder a ella el owner o los que tengan el rol FEED_MANAGER
-    function setFeeds(address _nuevoFeed) external soloOwnerORol(FEED_MANAGER) whenPaused {
-        if (_nuevoFeed == address(0)) revert KipuBank_DireccionInvalida();
+    /// @notice Function to change the data feeds
+    /// @param _newFeed The new data feed address
+    /// @dev Only the owner can access this function
+    function setFeeds(address _newFeed) external onlyOwnerORole(FEED_MANAGER) whenPaused {
+        if (_newFeed == address(0)) revert KipuBank_InvalidAddress();
 
-        try AggregatorV3Interface(_nuevoFeed).latestRoundData() returns (
+        try AggregatorV3Interface(_newFeed).latestRoundData() returns (
             uint80, int256 price, uint256, uint256 updateAt, uint80
         ) {
-            if(price <= 0) revert KipuBank_FeedInvalido(_nuevoFeed);
-           
-            if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_PrecioDesactualizado(uint(price));
+            if(price <= 0) revert KipuBank_InvalidFeed(_newFeed);
+            if(block.timestamp - updateAt > HEARTBEAT) revert KipuBank_OutdatedPrice(uint(price));
             
-            address feedAnterior = address(s_feed);
-            s_feed = AggregatorV3Interface(_nuevoFeed);
-            emit KipuBank_FeedActualizado(feedAnterior, _nuevoFeed);
+            address previousFeed = address(s_feed);
+            s_feed = AggregatorV3Interface(_newFeed);
+            emit KipuBank_FeedUpdated(previousFeed, _newFeed);
         } catch {
-            revert KipuBank_FeedInvalido(_nuevoFeed);
+            revert KipuBank_InvalidFeed(_newFeed);
         }        
     }
 
-    /// @notice Función para pausar el contrato
-    /// @dev Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER
-    function pausarContrato() external soloOwnerORol(PAUSER) whenNotPaused {
+    /// @notice Function to pause the contract
+    /// @dev Only the owner and the PAUSER role can access this function
+    function pauseContract() external onlyOwnerORole(PAUSER) whenNotPaused {
         _pause();
-        emit KipuBank_ContratoPausado(msg.sender, block.timestamp);
+        emit KipuBank_ContractPaused(msg.sender, block.timestamp);
     }
 
-    /// @notice Función para despausar el contrato
-    /// @dev Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER
-    function despausarContrato() external soloOwnerORol(PAUSER) whenPaused {
+    /// @notice Function to unpause the contract
+    /// @dev Only the owner and the PAUSER role can access this function
+    function unpauseContract() external onlyOwnerORole(PAUSER) whenPaused {
         _unpause();
-        emit KipuBank_ContratoDespausado(msg.sender, block.timestamp);
+        emit KipuBank_ContractUnpaused(msg.sender, block.timestamp);
     }
 
-    /// @notice Función para dar un rol a una cuenta
-    /// @param cuenta Es la cuenta que recibe el rol
-    /// @param rol Es el rol dado a la cuenta
-    function darRol(address cuenta, bytes32 rol) external onlyOwner {
-        grantRole(rol, cuenta);
-        emit KipuBank_RolDado(cuenta, rol);
+    /// @notice Function to grant a role
+    /// @param account The account is granted with the new role
+    /// @param role The role is granted
+    function grantRole(bytes32 role, address account) 
+    public 
+    override 
+    onlyOwner 
+    {
+        super.grantRole(role, account);
+        emit KipuBank_GrantedRole(account, role);
     }
 
-    /// @notice Función para revocar el rol a una cuenta
-    /// @param cuenta Es la cuenta a la que se le revoca el rol
-    /// @param rol Es el rol revocado de la cuenta
-    function revocarRol(address cuenta, bytes32 rol) external onlyOwner {
-        revokeRole(rol, cuenta);
-        emit KipuBank_RolRevocado(cuenta, rol);
+    /// @notice Function to revoke a role
+    /// @param account The account that is revoked
+    /// @param role The role that is revoked
+    function revokeRole(bytes32 role, address account) 
+    public 
+    override
+    onlyOwner 
+    {
+        super.revokeRole(role, account);
+        emit KipuBank_RoleRevoked(account, role);
     }
 
-    /// @notice Función para ver el estado del contrato
-    function estadoDelContrato() external view 
+    /// @notice Function to view the contract state
+    /// @notice Returns the total contract balance, the bankcap, the threshold and the current data feeds provider
+    function viewContractState() external view 
     returns (
-        bool pausado, 
-        uint totalContrato, 
-        uint limite, 
-        uint umbral, 
-        address feedActual
-        ) {
+        bool isPaused,
+        uint totalContract,
+        uint limit,
+        uint threshold,
+        address actualFeed
+    )
+    {
         return (
             paused(),
-            s_totalContrato,
+            s_totalContract,
             i_bankCap,
-            i_umbral,
+            i_threshold,
             address(s_feed)
         );
     }    
 
-    /// @notice Función para ver el saldo por token del titular
-    /// @param titular Es el titular de la cuenta
-    /// @param token Es el token que se desea consultar
-    /// @return Retorna un entero sin signo, que es el saldo correspondiente
-    function balanceOf(address titular, address token) external view returns (uint) {
-        return s_cuentasMultiToken[token][titular];
+    /// @notice Function to view to each tokens funds for holder
+    /// @param _holder The holder of the account
+    /// @param _token The token to consult
+    function balanceOf(address _holder, address _token) external view returns (uint) {
+        return s_balances[_token][_holder];
     }
 
-    /// @notice Override requerido por Solidity para la múltiple herencia
+    /// @notice Requiered Override to multiple inheritance
     function supportsInterface(bytes4 interfaceId) 
         public 
         view 

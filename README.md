@@ -16,7 +16,7 @@ Esta versión presenta una arquitectura más sólida, mejor eficiencia en gas, y
 | **Seguridad** | Uso de `ReentrancyGuard` y patrón CEI | Previene ataques de reentrancy. |
 | **Control administrativo** | Integración de `Ownable` y `Pausable` | Permite pausar operaciones ante mantenimiento o emergencias. |
 | **Eficiencia** | Reemplazo de `require()` por `custom errors` | Reducción significativa en consumo de gas. |
-| **Auditoría** | Nuevos eventos: `DepositoETH`, `DepositoUSDC`, `RetiroETH`, `RetiroUSDC` | Mejor trazabilidad en exploradores y logs. |
+| **Auditoría** | Nuevos eventos: `SuccessfulDeposit`, `SuccessfulWithdrawal` | Mejor trazabilidad en exploradores y logs. |
 
 ---
 
@@ -25,10 +25,10 @@ Esta versión presenta una arquitectura más sólida, mejor eficiencia en gas, y
 Cada usuario posee **una bóveda que se bifurca en dos**, una para **ETH** y otra para **USDC**, gestionadas mediante un `mapping` anidado:
 
 ```solidity
-   mapping (address token => mapping (address titular => uint monto)) private s_cuentasMultiToken;
+   mapping (address token => mapping (address holder=> uint amount)) private s_balances;
 ```
 
-Los límites globales (`bankCap`) y de retiro (`umbral`) se definen en el **constructor** al momento del despliegue.  
+Los límites globales (`bankCap`) y de retiro (`threshold`) se definen en el **constructor** al momento del despliegue.  
 
 ---
 
@@ -36,13 +36,11 @@ Los límites globales (`bankCap`) y de retiro (`umbral`) se definen en el **cons
 
 | Función | Tipo | Descripción |
 |----------|------|-------------|
-| `depositarETH()` | `payable` | Permite depositar Ether en la bóveda personal del usuario, verificando el límite global. |
-| `retirarETH(uint256 monto)` | `external` | Retira Ether si el monto no supera el umbral ni el saldo personal. |
-| `depositarUSDC(uint256 monto)` | `external` | Deposita tokens USDC al contrato usando la interfaz `IERC20`. |
-| `retirarUSDC(uint256 monto)` | `external` | Envía USDC de vuelta al usuario, respetando umbral y saldo. |
-| `verSaldoETH()` | `view` | Devuelve el saldo ETH del usuario. |
-| `verSaldoUSDC()` | `view` | Devuelve el saldo USDC del usuario. |
-| `verTotalContrato()` | `view` | Devuelve el total combinado de ETH y USDC dentro del contrato. |
+| `depositETH()` | `payable` | Permite depositar Ether en la bóveda personal del usuario, verificando el límite global. |
+| `withdrawalETH(uint256 amount)` | `external` | Retira Ether si el monto no supera el umbral ni el saldo personal. |
+| `depositUSDC(uint256 amount)` | `external` | Deposita tokens USDC al contrato usando la interfaz `IERC20`. |
+| `retirarUSDC(uint256 amount)` | `external` | Envía USDC de vuelta al usuario, respetando umbral y saldo. |
+| `viewContractBalance()` | `view` | Devuelve el total combinado de ETH y USDC dentro del contrato en USD. |
 | `balanceOf(address titular, address token)` | `view` | Función para ver de los distintos balances en una única función. |
 
 ---
@@ -68,11 +66,11 @@ Los límites globales (`bankCap`) y de retiro (`umbral`) se definen en el **cons
 
 | Acción | Descripción |
 |--------|--------------|
-| 💰 **Depositar ETH** | Ejecutar `depositarETH()` e ingresar el monto en `Value` (ej: `1 ether`). |
-| 💵 **Depositar USDC** | Llamar `depositarUSDC(uint monto)` (el usuario debe haber hecho `approve` previamente al contrato). |
-| 💸 **Retirar ETH** | Llamar `retirarETH(uint monto)` indicando el monto en wei. |
-| 💳 **Retirar USDC** | Llamar `retirarUSDC(uint monto)` para recibir los tokens en tu wallet. |
-| 📊 **Consultar saldos** | Usar `verBovedaETH()` o `verBovedaUSDC()`. |
+| 💰 **Depositar ETH** | Ejecutar `depositETH()` e ingresar el monto en `Value` (ej: `1 ether`). |
+| 💵 **Depositar USDC** | Llamar `depositUSDC(uint amount)` (el usuario debe haber hecho `approve` previamente al contrato). |
+| 💸 **Retirar ETH** | Llamar `withdrawalETH(uint amount)` indicando el monto en wei. |
+| 💳 **Retirar USDC** | Llamar `withdrawalUSDC(uint amount)` para recibir los tokens en tu wallet. |
+| 📊 **Consultar saldos** | Usar `balanceOf(address _holder, address _token)` indicando la cuenta y el token a consultar . |
 
 ---
 
@@ -97,7 +95,7 @@ KipuBankV2 aplica un enfoque de **seguridad multicapa** basado en buenas prácti
 | `Pausable` para mantenimiento | Permite actualizaciones o auditorías sin pérdida de fondos. | Durante el mantenimiento, los usuarios no pueden operar. |
 | ReentrancyGuard de OpenZeppelin | Previene exploits críticos. | Leve aumento de gas (~150 unidades por función protegida). |
 | Custom errors | Ahorro de gas y mensajes más claros. | Algunas herramientas antiguas no los muestran correctamente. |
-| Límite `bankCap` y `umbral` | Control de flujo y riesgo. | Requiere calibración precisa según el entorno. |
+| Límite `bankCap` y `threshold` | Control de flujo y riesgo. | Requiere calibración precisa según el entorno. |
 
 ---
 

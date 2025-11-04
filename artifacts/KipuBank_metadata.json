@@ -9,12 +9,12 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_limite",
+						"name": "_limit",
 						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "_umbral",
+						"name": "_threshold",
 						"type": "uint256"
 					},
 					{
@@ -68,188 +68,188 @@
 				"type": "error"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_CommittedOracle",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ExceededLimit",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_ExceededThreshold",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "holder",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_InsufficientsFunds",
+				"type": "error"
+			},
+			{
 				"inputs": [],
-				"name": "KipuBank_DireccionInvalida",
+				"name": "KipuBank_InvalidAddress",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "titular",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "monto",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_ExtraccionRechazada",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "nuevoFeed",
+						"name": "newFeed",
 						"type": "address"
 					}
 				],
-				"name": "KipuBank_FeedInvalido",
+				"name": "KipuBank_InvalidFeed",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "monto",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_InferiorDepositoMinimo",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "limite",
+						"name": "limit",
 						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "umbral",
+						"name": "threshold",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_InicializacionInvalida",
+				"name": "KipuBank_InvalidInit",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "monto",
+						"name": "limit",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_LimiteExcedido",
+				"name": "KipuBank_InvalidLimit",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "limite",
+						"name": "threshold",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_LimiteInvalido",
+				"name": "KipuBank_InvalidThreshold",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_LowerMinimumAmount",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "titular",
+						"name": "account",
 						"type": "address"
 					}
 				],
-				"name": "KipuBank_MontoCero",
+				"name": "KipuBank_NonPermittedAccess",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "monto",
+						"name": "amount",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_MontoNoAutorizado",
+				"name": "KipuBank_NonPermittedAmount",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "sender",
+						"name": "holder",
 						"type": "address"
 					}
 				],
-				"name": "KipuBank_NoAutorizado",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "titular",
-						"type": "address"
-					}
-				],
-				"name": "KipuBank_OperacionNoPermitida",
+				"name": "KipuBank_NonPermittedOperation",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "precio",
+						"name": "price",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_OraculoComprometido",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "precio",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_PrecioDesactualizado",
+				"name": "KipuBank_OutdatedPrice",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "titular",
+						"name": "holder",
 						"type": "address"
 					},
 					{
 						"internalType": "uint256",
-						"name": "monto",
+						"name": "amount",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_SaldoInsuficiente",
+				"name": "KipuBank_RejectedWithdraw",
 				"type": "error"
 			},
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "monto",
-						"type": "uint256"
+						"internalType": "address",
+						"name": "holder",
+						"type": "address"
 					}
 				],
-				"name": "KipuBank_UmbralExcedido",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "umbral",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_UmbralInvalido",
+				"name": "KipuBank_ZeroAmount",
 				"type": "error"
 			},
 			{
@@ -291,17 +291,17 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "sender",
+						"name": "pauser",
 						"type": "address"
 					},
 					{
 						"indexed": false,
 						"internalType": "uint256",
-						"name": "tiempo",
+						"name": "time",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_ContratoDespausado",
+				"name": "KipuBank_ContractPaused",
 				"type": "event"
 			},
 			{
@@ -310,17 +310,17 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "sender",
+						"name": "unpauser",
 						"type": "address"
 					},
 					{
 						"indexed": false,
 						"internalType": "uint256",
-						"name": "tiempo",
+						"name": "time",
 						"type": "uint256"
 					}
 				],
-				"name": "KipuBank_ContratoPausado",
+				"name": "KipuBank_ContractUnpaused",
 				"type": "event"
 			},
 			{
@@ -329,55 +329,17 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "titular",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "monto",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_DepositoRealizado",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "titular",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "monto",
-						"type": "uint256"
-					}
-				],
-				"name": "KipuBank_ExtraccionRealizada",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "antiguoFeed",
+						"name": "previousFeed",
 						"type": "address"
 					},
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "nuevoFeed",
+						"name": "newFeed",
 						"type": "address"
 					}
 				],
-				"name": "KipuBank_FeedActualizado",
+				"name": "KipuBank_FeedUpdated",
 				"type": "event"
 			},
 			{
@@ -386,36 +348,17 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "ownerViejo",
-						"type": "address"
-					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "ownerNuevo",
-						"type": "address"
-					}
-				],
-				"name": "KipuBank_OwnerTransferido",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "cuenta",
+						"name": "account",
 						"type": "address"
 					},
 					{
 						"indexed": false,
 						"internalType": "bytes32",
-						"name": "rol",
+						"name": "role",
 						"type": "bytes32"
 					}
 				],
-				"name": "KipuBank_RolDado",
+				"name": "KipuBank_GrantedRole",
 				"type": "event"
 			},
 			{
@@ -424,17 +367,74 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "cuenta",
+						"name": "account",
 						"type": "address"
 					},
 					{
 						"indexed": false,
 						"internalType": "bytes32",
-						"name": "rol",
+						"name": "role",
 						"type": "bytes32"
 					}
 				],
-				"name": "KipuBank_RolRevocado",
+				"name": "KipuBank_RoleRevoked",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "holder",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_SuccessfulDeposit",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "holder",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "KipuBank_SuccessfulWithdrawal",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "KipuBank_TransferredOwner",
 				"type": "event"
 			},
 			{
@@ -589,7 +589,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "MIN_DEPOSITO",
+				"name": "MIN_DEPOSIT",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -617,12 +617,12 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "titular",
+						"name": "_holder",
 						"type": "address"
 					},
 					{
 						"internalType": "address",
-						"name": "token",
+						"name": "_token",
 						"type": "address"
 					}
 				],
@@ -638,26 +638,8 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "cuenta",
-						"type": "address"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "rol",
-						"type": "bytes32"
-					}
-				],
-				"name": "darRol",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"inputs": [],
-				"name": "depositarETH",
+				"name": "depositETH",
 				"outputs": [],
 				"stateMutability": "payable",
 				"type": "function"
@@ -666,53 +648,13 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_monto",
+						"name": "_amount",
 						"type": "uint256"
 					}
 				],
 				"name": "depositarUSDC",
 				"outputs": [],
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "despausarContrato",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "estadoDelContrato",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "pausado",
-						"type": "bool"
-					},
-					{
-						"internalType": "uint256",
-						"name": "totalContrato",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "limite",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "umbral",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "feedActual",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -791,7 +733,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "pausarContrato",
+				"name": "pauseContract",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -837,50 +779,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "_monto",
-						"type": "uint256"
-					}
-				],
-				"name": "retirarETH",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_monto",
-						"type": "uint256"
-					}
-				],
-				"name": "retirarUSDC",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "cuenta",
-						"type": "address"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "rol",
-						"type": "bytes32"
-					}
-				],
-				"name": "revocarRol",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "bytes32",
 						"name": "role",
 						"type": "bytes32"
@@ -913,7 +811,7 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_nuevoFeed",
+						"name": "_newFeed",
 						"type": "address"
 					}
 				],
@@ -958,22 +856,29 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_nuevoOwner",
+						"name": "_newOwner",
 						"type": "address"
 					}
 				],
-				"name": "transferirOwner",
+				"name": "transferTheOwnership",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
 				"inputs": [],
-				"name": "verBoveda",
+				"name": "unpauseContract",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "viewAccountTotalBalance",
 				"outputs": [
 					{
 						"internalType": "uint256",
-						"name": "monto_",
+						"name": "amount_",
 						"type": "uint256"
 					}
 				],
@@ -982,33 +887,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "verSaldoETH",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "saldo_",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "verSaldoUSDC",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "saldo_",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "verTotalContrato",
+				"name": "viewContractBalance",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -1021,7 +900,40 @@
 			},
 			{
 				"inputs": [],
-				"name": "verTotalDepositos",
+				"name": "viewContractState",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "isPaused",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalContract",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "limit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "threshold",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "actualFeed",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "viewDepositsCount",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -1034,7 +946,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "verTotalRetiros",
+				"name": "viewWithdrawCount",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -1043,6 +955,32 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawETH",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawUSDC",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -1072,111 +1010,111 @@
 						"details": "The operation failed because the contract is not paused."
 					}
 				],
-				"KipuBank_ExtraccionRechazada(address,uint256)": [
+				"KipuBank_CommittedOracle(uint256)": [
 					{
 						"params": {
-							"monto": "monto a extraer de la boveda",
-							"titular": "titular de la cuenta a realizar la extracción"
+							"price": "The incorrect price"
 						}
 					}
 				],
-				"KipuBank_FeedInvalido(address)": [
+				"KipuBank_ExceededLimit(uint256)": [
 					{
 						"params": {
-							"nuevoFeed": "Es el data feed erroneo que quiso ser ingresado"
+							"amount": "The amount that exceeded the limite"
 						}
 					}
 				],
-				"KipuBank_InferiorDepositoMinimo(uint256)": [
+				"KipuBank_ExceededThreshold(uint256)": [
 					{
 						"params": {
-							"monto": "Monto inferior al déposito mínimo"
+							"amount": "The amount that exceeds the threshold"
 						}
 					}
 				],
-				"KipuBank_InicializacionInvalida(uint256,uint256)": [
+				"KipuBank_InsufficientsFunds(address,uint256)": [
 					{
 						"params": {
-							"limite": "limite del contrato",
-							"umbral": "umbral del contrato"
+							"amount": "The amount to withdraw",
+							"holder": "The holder with insufficient funds"
 						}
 					}
 				],
-				"KipuBank_LimiteExcedido(uint256)": [
+				"KipuBank_InvalidFeed(address)": [
 					{
 						"params": {
-							"monto": "monto que excede el limite a depositar"
+							"newFeed": "The new data feed provider"
 						}
 					}
 				],
-				"KipuBank_LimiteInvalido(uint256)": [
+				"KipuBank_InvalidInit(uint256,uint256)": [
 					{
 						"params": {
-							"limite": "limite que es invalido"
+							"limit": "The limit of the contract",
+							"threshold": "The attempted threshold of the contract"
 						}
 					}
 				],
-				"KipuBank_MontoCero(address)": [
+				"KipuBank_InvalidLimit(uint256)": [
 					{
 						"params": {
-							"titular": "titular que emite una transaccion con valor nulo"
+							"limit": "The limit that is invalid"
 						}
 					}
 				],
-				"KipuBank_MontoNoAutorizado(uint256)": [
+				"KipuBank_InvalidThreshold(uint256)": [
 					{
 						"params": {
-							"monto": "Monto excedido"
+							"threshold": "The invalid threshold"
 						}
 					}
 				],
-				"KipuBank_NoAutorizado(address)": [
+				"KipuBank_LowerMinimumAmount(uint256)": [
 					{
 						"params": {
-							"sender": "Es la cuenta que quiso acceder a la función"
+							"amount": "The amount that is below the minimum"
 						}
 					}
 				],
-				"KipuBank_OperacionNoPermitida(address)": [
+				"KipuBank_NonPermittedAccess(address)": [
 					{
 						"params": {
-							"titular": "titular que realizo la operacion no permitida"
+							"account": "The account that attempted to access a non-permitted function"
 						}
 					}
 				],
-				"KipuBank_OraculoComprometido(uint256)": [
+				"KipuBank_NonPermittedAmount(uint256)": [
 					{
 						"params": {
-							"precio": "Precio que dió el óraculo"
+							"amount": "The exceeded amount"
 						}
 					}
 				],
-				"KipuBank_PrecioDesactualizado(uint256)": [
+				"KipuBank_NonPermittedOperation(address)": [
 					{
 						"params": {
-							"precio": "Es el precio que quedó desactualizado"
+							"holder": "The holder who attempted a non-permitted operation"
 						}
 					}
 				],
-				"KipuBank_SaldoInsuficiente(address,uint256)": [
+				"KipuBank_OutdatedPrice(uint256)": [
 					{
 						"params": {
-							"monto": "monto a retirar",
-							"titular": "titular con saldo insuficiente"
+							"price": "The outdate price"
 						}
 					}
 				],
-				"KipuBank_UmbralExcedido(uint256)": [
+				"KipuBank_RejectedWithdraw(address,uint256)": [
 					{
 						"params": {
-							"monto": "que excede el umbral establecido"
+							"amount": "The amount to withdraw",
+							"holder": "The holder that perfomed the withdrawal"
 						}
 					}
 				],
-				"KipuBank_UmbralInvalido(uint256)": [
+				"KipuBank_ZeroAmount(address)": [
 					{
 						"params": {
-							"umbral": "umbral que es invalido"
+							"holder": "The holder who attempted a transaction with zero value"
 						}
 					}
 				],
@@ -1197,52 +1135,52 @@
 				]
 			},
 			"events": {
-				"KipuBank_ContratoDespausado(address,uint256)": {
+				"KipuBank_ContractPaused(address,uint256)": {
 					"params": {
-						"sender": "Es la direccion que despausó el contrato",
-						"tiempo": "Es el tiempo en el que fue despausado"
+						"pauser": "The address that paused the contract",
+						"time": "The timestamp when was paused"
 					}
 				},
-				"KipuBank_ContratoPausado(address,uint256)": {
+				"KipuBank_ContractUnpaused(address,uint256)": {
 					"params": {
-						"sender": "Es la dirección que pauso el contrato",
-						"tiempo": "Es el tiempo en el que fue pausado el contrato"
+						"time": "The timestamp when was unpaused",
+						"unpauser": "The address that unpaused the contract"
 					}
 				},
-				"KipuBank_DepositoRealizado(address,uint256)": {
+				"KipuBank_FeedUpdated(address,address)": {
 					"params": {
-						"monto": "monto que se desea depositar",
-						"titular": "titular que realiza el detposito"
+						"newFeed": "The new feed address",
+						"previousFeed": "Was the previous feed address"
 					}
 				},
-				"KipuBank_ExtraccionRealizada(address,uint256)": {
+				"KipuBank_GrantedRole(address,bytes32)": {
 					"params": {
-						"monto": "monto que se desea extraer",
-						"titular": "titular que desea realizar la extracción"
+						"account": "The account that was granted the new role",
+						"role": "The role was granted"
 					}
 				},
-				"KipuBank_FeedActualizado(address,address)": {
+				"KipuBank_RoleRevoked(address,bytes32)": {
 					"params": {
-						"antiguoFeed": "Es el antiguo data feed utilizado",
-						"nuevoFeed": "Es el nuevo data feed a ser utilizado"
+						"account": "The account that was revoked the role",
+						"role": "The role that revoked"
 					}
 				},
-				"KipuBank_OwnerTransferido(address,address)": {
+				"KipuBank_SuccessfulDeposit(address,uint256)": {
 					"params": {
-						"ownerNuevo": "Es el nuevo owner del contrato",
-						"ownerViejo": "Es el anterior owner del contrato"
+						"amount": "The Deposited amount",
+						"holder": "Holder who made the deposit"
 					}
 				},
-				"KipuBank_RolDado(address,bytes32)": {
+				"KipuBank_SuccessfulWithdrawal(address,uint256)": {
 					"params": {
-						"cuenta": "Es la cuenta que recibe el nuevo rol",
-						"rol": "Es el rol que se le asigna a la cuenta"
+						"amount": "The amount withdrawn",
+						"holder": "The holder who perfomed the withdrawal"
 					}
 				},
-				"KipuBank_RolRevocado(address,bytes32)": {
+				"KipuBank_TransferredOwner(address,address)": {
 					"params": {
-						"cuenta": "Es la cuenta a la que se revoca el rol",
-						"rol": "Es el rol que se elimina de la cuenta"
+						"newOwner": "The new owner of the contract",
+						"previousOwner": "The previous owner of the contract"
 					}
 				},
 				"Paused(address)": {
@@ -1265,42 +1203,33 @@
 			"methods": {
 				"balanceOf(address,address)": {
 					"params": {
-						"titular": "Es el titular de la cuenta",
-						"token": "Es el token que se desea consultar"
-					},
-					"returns": {
-						"_0": "Retorna un entero sin signo, que es el saldo correspondiente"
+						"_holder": "The holder of the account",
+						"_token": "The token to consult"
 					}
 				},
 				"constructor": {
-					"details": "Se deben generar el limite, umbral y las direcciones del data feed y el token a utilizar al momento de desplegar el contrato",
+					"details": "They must be generated at the time of deployment",
 					"params": {
-						"_feed": "Direccion del data feed a utlizar",
-						"_limite": "Limite global que se permite por transaccion",
-						"_tokenERC20": "Direccion del token ERC20 a utilizar",
-						"_umbral": "Umbral de limite de retiros"
+						"_feed": "The feed address to use",
+						"_limit": "The global limit for the contract",
+						"_threshold": "The global threshold for the contract",
+						"_tokenERC20": "The address of the ERC20 token to use"
 					}
 				},
-				"darRol(address,bytes32)": {
-					"params": {
-						"cuenta": "Es la cuenta que recibe el rol",
-						"rol": "Es el rol dado a la cuenta"
-					}
-				},
-				"depositarETH()": {
-					"details": "Debe ser payable"
+				"depositETH()": {
+					"details": "Must be payable"
 				},
 				"depositarUSDC(uint256)": {
-					"details": "Es payable y usa el modificador de verificarDepositosSe utiliza la interfaz SafeIERC20 para realizar la transferencia de token ERC20No se marca como payable ya que es un token ERC20 y no EtherNecesitamos la aprobación del dueño de los USDC para depositar"
-				},
-				"despausarContrato()": {
-					"details": "Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER"
+					"details": "It is payable and use the verifyUsdcAmount modifierIt is used the SafeIERC20 interface to performWe need the aprobation of the owner tokens"
 				},
 				"getRoleAdmin(bytes32)": {
 					"details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
 				},
 				"grantRole(bytes32,address)": {
-					"details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleGranted} event."
+					"params": {
+						"account": "The account is granted with the new role",
+						"role": "The role is granted"
+					}
 				},
 				"hasRole(bytes32,address)": {
 					"details": "Returns `true` if `account` has been granted `role`."
@@ -1308,8 +1237,8 @@
 				"owner()": {
 					"details": "Returns the address of the current owner."
 				},
-				"pausarContrato()": {
-					"details": "Solo pueden acceder a ella el owner el aquellos que tengan rol PAUSER"
+				"pauseContract()": {
+					"details": "Only the owner and the PAUSER role can access this function"
 				},
 				"paused()": {
 					"details": "Returns true if the contract is paused, and false otherwise."
@@ -1320,278 +1249,250 @@
 				"renounceRole(bytes32,address)": {
 					"details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `callerConfirmation`. May emit a {RoleRevoked} event."
 				},
-				"retirarETH(uint256)": {
-					"params": {
-						"_monto": "es el monto a retirar de la boveda"
-					}
-				},
-				"retirarUSDC(uint256)": {
-					"params": {
-						"_monto": "es el monto a retirar de la boveda"
-					}
-				},
-				"revocarRol(address,bytes32)": {
-					"params": {
-						"cuenta": "Es la cuenta a la que se le revoca el rol",
-						"rol": "Es el rol revocado de la cuenta"
-					}
-				},
 				"revokeRole(bytes32,address)": {
-					"details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleRevoked} event."
+					"params": {
+						"account": "The account that is revoked",
+						"role": "The role that is revoked"
+					}
 				},
 				"setFeeds(address)": {
-					"details": "Solo pueden acceder a ella el owner o los que tengan el rol FEED_MANAGER",
+					"details": "Only the owner can access this function",
 					"params": {
-						"_nuevoFeed": "Será la dirección del nuevo data feed del contrato"
+						"_newFeed": "The new data feed address"
 					}
 				},
 				"transferOwnership(address)": {
 					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
 				},
-				"transferirOwner(address)": {
-					"details": "El modificador de onlyOwner es necesario para seguridad",
+				"transferTheOwnership(address)": {
+					"details": "It is used the onlyOwner modifier",
 					"params": {
-						"_nuevoOwner": "Será la dirección del nuevo propietario del contrato"
+						"_newOwner": "The address of the new owner of the contract"
 					}
 				},
-				"verBoveda()": {
+				"unpauseContract()": {
+					"details": "Only the owner and the PAUSER role can access this function"
+				},
+				"viewAccountTotalBalance()": {
 					"returns": {
-						"monto_": "devuelve el saldo depositado total en USD depositado por cada titular"
+						"amount_": "The amount of the total balance in USD"
 					}
 				},
-				"verSaldoETH()": {
-					"returns": {
-						"saldo_": "Retornal el saldo en ETH"
+				"withdrawETH(uint256)": {
+					"params": {
+						"_amount": "The amount to withdraw"
 					}
 				},
-				"verSaldoUSDC()": {
-					"returns": {
-						"saldo_": "Retorna el saldo en USDC"
-					}
-				},
-				"verTotalContrato()": {
-					"returns": {
-						"_0": "Devuelve el saldo del contrato en USD"
-					}
-				},
-				"verTotalDepositos()": {
-					"returns": {
-						"_0": "Devuelve la cantidad de depositos"
-					}
-				},
-				"verTotalRetiros()": {
-					"returns": {
-						"_0": "Devuelve la cantidad de retiros"
+				"withdrawUSDC(uint256)": {
+					"params": {
+						"_amount": "The amount to withdraw"
 					}
 				}
 			},
 			"stateVariables": {
 				"DECIMAL_FACTOR": {
-					"details": "Se hace la suma de los decimales de ethereum y de los decimales de la conversión de chainlink para restarles los decimales de USDC, nos da la base igualitaria"
+					"details": "We do the sum of ethereum decimals y chainlink decimals, then we substraction of the USDC decimals, it gave us the basis for equalization"
 				},
 				"HEARTBEAT": {
-					"details": "Por convención se establece en 3600"
+					"details": "By convention we use 3600"
+				},
+				"MIN_DEPOSIT": {
+					"details": "Will use 1 Gwei as minimun"
 				},
 				"i_bankCap": {
-					"details": "Tener en cuenta que el limite global será en USD"
+					"details": "Keep in mind, global limit will be in USD"
 				},
 				"i_usdc": {
-					"details": "Es especifico para el token USDC"
+					"details": "USDC specific token"
 				},
-				"s_cuentasMultiToken": {
-					"details": "En el primer mapping tenemos la direcciones del token, en el segundo mapping tenemos las direcciones de los titulares"
+				"s_balances": {
+					"details": "In the first mapping we have token address, in the nested mapping we have the holder and their balance"
 				},
 				"s_feed": {
-					"details": "Utilizamos el data feed de Chainlink"
+					"details": "We use data feeds of ChainkLink"
 				},
-				"s_totalContrato": {
-					"details": "El total del contrato es en USD"
+				"s_totalContract": {
+					"details": "Total of the contract it is counted in USD"
 				}
 			},
 			"version": 1
 		},
 		"userdoc": {
 			"errors": {
-				"KipuBank_DireccionInvalida()": [
+				"KipuBank_CommittedOracle(uint256)": [
 					{
-						"notice": "Error por querer hacer un \"set\" de una dirección invalida"
+						"notice": "Oracle price error"
 					}
 				],
-				"KipuBank_ExtraccionRechazada(address,uint256)": [
+				"KipuBank_ExceededLimit(uint256)": [
 					{
-						"notice": "Error de extraccion"
+						"notice": "Exceeding limit error"
 					}
 				],
-				"KipuBank_FeedInvalido(address)": [
+				"KipuBank_ExceededThreshold(uint256)": [
 					{
-						"notice": "Error por querer ingresar un data feed invalido"
+						"notice": "Threshold exceeded error"
 					}
 				],
-				"KipuBank_InferiorDepositoMinimo(uint256)": [
+				"KipuBank_InsufficientsFunds(address,uint256)": [
 					{
-						"notice": "Error de monto inferior al déposito mínimo"
+						"notice": "Insufficient funds error"
 					}
 				],
-				"KipuBank_InicializacionInvalida(uint256,uint256)": [
+				"KipuBank_InvalidAddress()": [
 					{
-						"notice": "Error de umbral mayor al limite"
+						"notice": "Invalid address set error"
 					}
 				],
-				"KipuBank_LimiteExcedido(uint256)": [
+				"KipuBank_InvalidFeed(address)": [
 					{
-						"notice": "Error por sobrepasarse del limite"
+						"notice": "Invalid data feed address error"
 					}
 				],
-				"KipuBank_LimiteInvalido(uint256)": [
+				"KipuBank_InvalidInit(uint256,uint256)": [
 					{
-						"notice": "Error por limite invalido"
+						"notice": "Limit above threshold error"
 					}
 				],
-				"KipuBank_MontoCero(address)": [
+				"KipuBank_InvalidLimit(uint256)": [
 					{
-						"notice": "Error monto cero"
+						"notice": "Invalid limit error"
 					}
 				],
-				"KipuBank_MontoNoAutorizado(uint256)": [
+				"KipuBank_InvalidThreshold(uint256)": [
 					{
-						"notice": "Error de monto no autorizado a depositar"
+						"notice": "Invalid threshold error"
 					}
 				],
-				"KipuBank_NoAutorizado(address)": [
+				"KipuBank_LowerMinimumAmount(uint256)": [
 					{
-						"notice": "Error cuando alguien no autorizado quiere acceder a una función"
+						"notice": "Amount lower than minimum deposit"
 					}
 				],
-				"KipuBank_OperacionNoPermitida(address)": [
+				"KipuBank_NonPermittedAccess(address)": [
 					{
-						"notice": "Error por operacion no permitida"
+						"notice": "Non-permitted function access error"
 					}
 				],
-				"KipuBank_OraculoComprometido(uint256)": [
+				"KipuBank_NonPermittedAmount(uint256)": [
 					{
-						"notice": "Error por óraculo dando un precio equivoco"
+						"notice": "Non-permitted deposit amount"
 					}
 				],
-				"KipuBank_PrecioDesactualizado(uint256)": [
+				"KipuBank_NonPermittedOperation(address)": [
 					{
-						"notice": "Error por precio desactualizado"
+						"notice": "Operation not permitted error"
 					}
 				],
-				"KipuBank_SaldoInsuficiente(address,uint256)": [
+				"KipuBank_OutdatedPrice(uint256)": [
 					{
-						"notice": "Error por saldo insuficiente"
+						"notice": "Outdated price error"
 					}
 				],
-				"KipuBank_UmbralExcedido(uint256)": [
+				"KipuBank_RejectedWithdraw(address,uint256)": [
 					{
-						"notice": "Error por umbral excedido"
+						"notice": "Withdrawal rejected error "
 					}
 				],
-				"KipuBank_UmbralInvalido(uint256)": [
+				"KipuBank_ZeroAmount(address)": [
 					{
-						"notice": "Error por umbral invalido"
+						"notice": "Zero amount error"
 					}
 				]
 			},
 			"events": {
-				"KipuBank_ContratoDespausado(address,uint256)": {
-					"notice": "Evento para despausar el contrato"
+				"KipuBank_ContractPaused(address,uint256)": {
+					"notice": "Contract pause event"
 				},
-				"KipuBank_ContratoPausado(address,uint256)": {
-					"notice": "Evento para pausar el contrato"
+				"KipuBank_ContractUnpaused(address,uint256)": {
+					"notice": "Contract unpaused event"
 				},
-				"KipuBank_DepositoRealizado(address,uint256)": {
-					"notice": "Evento para depositos realizado exitosamente"
+				"KipuBank_FeedUpdated(address,address)": {
+					"notice": "Feed update event"
 				},
-				"KipuBank_ExtraccionRealizada(address,uint256)": {
-					"notice": "Evento para extracciones realizadas exitosamente"
+				"KipuBank_GrantedRole(address,bytes32)": {
+					"notice": "Rol granted event"
 				},
-				"KipuBank_FeedActualizado(address,address)": {
-					"notice": "Evento para la actualización del feed"
+				"KipuBank_RoleRevoked(address,bytes32)": {
+					"notice": "Role revoked event"
 				},
-				"KipuBank_OwnerTransferido(address,address)": {
-					"notice": "Evento para cuando el owner del contrato es transferido"
+				"KipuBank_SuccessfulDeposit(address,uint256)": {
+					"notice": "Successful deposit made event"
 				},
-				"KipuBank_RolDado(address,bytes32)": {
-					"notice": "Evento para cuando un rol es otorgado"
+				"KipuBank_SuccessfulWithdrawal(address,uint256)": {
+					"notice": "Successful withdrawal made"
 				},
-				"KipuBank_RolRevocado(address,bytes32)": {
-					"notice": "Evento para cuando un rol es revocado"
+				"KipuBank_TransferredOwner(address,address)": {
+					"notice": "Ownership transfer event"
 				}
 			},
 			"kind": "user",
 			"methods": {
 				"FEED_MANAGER()": {
-					"notice": "Rol de Manager de los data feeds"
+					"notice": "Data feeds manager rol"
 				},
-				"MIN_DEPOSITO()": {
-					"notice": "Deposito mínimo de Ether en el contrato"
+				"MIN_DEPOSIT()": {
+					"notice": "Minimum deposit of Ether to the contract"
 				},
 				"PAUSER()": {
-					"notice": "Rol de pausador del contrato"
+					"notice": "Pauser contract rol"
 				},
 				"balanceOf(address,address)": {
-					"notice": "Función para ver el saldo por token del titular"
+					"notice": "Function to view to each tokens funds for holder"
 				},
 				"constructor": {
-					"notice": "Constructor del contrato"
+					"notice": "Contract constructor"
 				},
-				"darRol(address,bytes32)": {
-					"notice": "Función para dar un rol a una cuenta"
-				},
-				"depositarETH()": {
-					"notice": "Funcion para depositar en la boveda"
+				"depositETH()": {
+					"notice": "Function to deposit ETH"
 				},
 				"depositarUSDC(uint256)": {
-					"notice": "Funcion para depositar en la boveda"
+					"notice": "Function to deposit USDC"
 				},
-				"despausarContrato()": {
-					"notice": "Función para despausar el contrato"
+				"grantRole(bytes32,address)": {
+					"notice": "Function to grant a role"
 				},
-				"estadoDelContrato()": {
-					"notice": "Función para ver el estado del contrato"
+				"pauseContract()": {
+					"notice": "Function to pause the contract"
 				},
-				"pausarContrato()": {
-					"notice": "Función para pausar el contrato"
-				},
-				"retirarETH(uint256)": {
-					"notice": "Funcion externa para realizar el retiro de saldo en ETH"
-				},
-				"retirarUSDC(uint256)": {
-					"notice": "Funcion externa para realizar el retiro de saldo en USDC"
-				},
-				"revocarRol(address,bytes32)": {
-					"notice": "Función para revocar el rol a una cuenta"
+				"revokeRole(bytes32,address)": {
+					"notice": "Function to revoke a role"
 				},
 				"s_feed()": {
-					"notice": "Interfaz publica del data feed"
+					"notice": "Public interface data feeds"
 				},
 				"setFeeds(address)": {
-					"notice": "Función para cambiar el data feeds"
+					"notice": "Function to change the data feeds"
 				},
 				"supportsInterface(bytes4)": {
-					"notice": "Override requerido por Solidity para la múltiple herencia"
+					"notice": "Requiered Override to multiple inheritance"
 				},
-				"transferirOwner(address)": {
-					"notice": "Función para traspasar el contrato a otro dueño"
+				"transferTheOwnership(address)": {
+					"notice": "Function to transfer the ownership another address"
 				},
-				"verBoveda()": {
-					"notice": "Funcion para ver el saldo total guardado en el boveda en USD"
+				"unpauseContract()": {
+					"notice": "Function to unpause the contract"
 				},
-				"verSaldoETH()": {
-					"notice": "Función para el saldo en ETH del titular"
+				"viewAccountTotalBalance()": {
+					"notice": "Function to view the balance in USD"
 				},
-				"verSaldoUSDC()": {
-					"notice": "Función para ver el saldo en USDC del titular"
+				"viewContractBalance()": {
+					"notice": "Function to view the contract balance in USD"
 				},
-				"verTotalContrato()": {
-					"notice": "Funcion para ver el saldo total del contrato en USD"
+				"viewContractState()": {
+					"notice": "Function to view the contract stateReturns the total contract balance, the bankcap, the threshold and the current data feeds provider"
 				},
-				"verTotalDepositos()": {
-					"notice": "Funcion para ver la cantidad total de los depositos realizados"
+				"viewDepositsCount()": {
+					"notice": "Function to view the deposits count"
 				},
-				"verTotalRetiros()": {
-					"notice": "Funcion para ver la cantidad total de los retiros realizados"
+				"viewWithdrawCount()": {
+					"notice": "Function to view the withdraws count"
+				},
+				"withdrawETH(uint256)": {
+					"notice": "External functoin to perform withdraw in ETH"
+				},
+				"withdrawUSDC(uint256)": {
+					"notice": "External function to withdraw USDC"
 				}
 			},
 			"version": 1
@@ -1726,11 +1627,11 @@
 			]
 		},
 		"contracts/KipuBank.sol": {
-			"keccak256": "0xd9d17abdb989b3e55d802b882e383968a0ab3c292c27a16f9052c707b77b5b2c",
+			"keccak256": "0x08d14bc3835607dd1d27fc7245cd4aa69b05db8c04fb77deafd79d680cf55fb6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e3199457dad8dc931dfe24f9eede7d62c4f9626320d5b17a40476cad1cf72992",
-				"dweb:/ipfs/QmYhWr19xaHARFsubAwkQNwAznr1hjUt5i38JtTZqn3m1H"
+				"bzz-raw://dc7870da5e29ead4db98ad0ea9bc1d1e2c60df90d6069f6908b2edcfd12fce67",
+				"dweb:/ipfs/QmaJioYkYycjekDAumHqBALsHoLp6X7xXPityXJNUXCtuL"
 			]
 		}
 	},
